@@ -91,8 +91,8 @@ export default function CDP() {
   };
 
   return (
-    <main className="lg:flex">
-      <nav className="hidden lg:block w-[20%] max-w-xs py-8 pl-6 pr-16">
+    <main className="lg:grid gap-6 grid-cols-12">
+      <nav className="hidden lg:block col-span-2 py-8 pl-6">
         <h1 className="text-lg font-semibold">Categories</h1>
         <ul>
           {categories.map((cat) => (
@@ -143,10 +143,7 @@ export default function CDP() {
           ))}
         </ul>
       </nav>
-      <Form
-        ref={formRef}
-        className="p-4 border-b border-zinc-700 lg:hidden lg:flex-1"
-      >
+      <Form ref={formRef} className="p-4 border-b border-zinc-700 lg:hidden">
         <label>
           <span className="sr-only">Categories</span>
           <select
@@ -186,7 +183,7 @@ export default function CDP() {
         </noscript>
       </Form>
 
-      <article className="sm:px-4 lg:px-0 lg:pr-6 mb-8">
+      <article className="sm:px-4 lg:px-0 lg:pr-6 mb-8 col-start-3 col-span-10">
         <p className="pl-4 mt-4 mb-8">
           Showing {products.length} results
           {search ? ` for "${search}"` : ""}
