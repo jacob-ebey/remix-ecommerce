@@ -40,10 +40,17 @@ export let loader: LoaderFunction = async ({ request }) => {
     return badImageResponse();
   }
 
+  let width = getIntOrNull(url.searchParams.get("width"));
+  let height = getIntOrNull(url.searchParams.get("height"));
+  let fit: any = url.searchParams.get("fit") || "cover";
+
   let hash = createHash("sha256");
   hash.update("v1");
   hash.update(request.method);
   hash.update(request.url);
+  hash.update(width?.toString() || "0");
+  hash.update(height?.toString() || "0");
+  hash.update(fit);
   let key = hash.digest("hex");
   let cachedFile = path.resolve(path.join(".cache/images", key + ".webp"));
 
@@ -95,9 +102,6 @@ export let loader: LoaderFunction = async ({ request }) => {
       console.error(error);
     });
 
-    let width = getIntOrNull(url.searchParams.get("width"));
-    let height = getIntOrNull(url.searchParams.get("height"));
-    let fit: any = url.searchParams.get("fit") || "cover";
     if (width || height) {
       sharpInstance.resize(width, height, { fit });
     }
