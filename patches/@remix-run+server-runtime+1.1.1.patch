@@ -1,0 +1,40 @@
+diff --git a/node_modules/@remix-run/server-runtime/server.js b/node_modules/@remix-run/server-runtime/server.js
+index d723f76..3064ab7 100644
+--- a/node_modules/@remix-run/server-runtime/server.js
++++ b/node_modules/@remix-run/server-runtime/server.js
+@@ -21,6 +21,7 @@ var mode = require('./mode.js');
+ var routes = require('./routes.js');
+ var responses = require('./responses.js');
+ var serverHandoff = require('./serverHandoff.js');
++var cookie = require("cookie");
+ 
+ /**
+  * The main request handler for a Remix server. This handler runs in the context
+@@ -228,6 +229,8 @@ async function renderDocumentRequest({
+         statusText: actionResponse.statusText
+       };
+ 
++
++
+       if (responses.isCatchResponse(actionResponse)) {
+         appState.catchBoundaryRouteId = getDeepestRouteIdWithBoundary(matches, "CatchBoundary");
+         appState.trackCatchBoundaries = false;
+@@ -267,6 +270,18 @@ async function renderDocumentRequest({
+     matchesToLoad.slice(0, -1), "ErrorBoundary");
+   }
+ 
++  if (actionResponse) {
++    let newCookieValues = cookie.parse(request.headers.get("Cookie"));
++    for (let [name, value] of Array.from(actionResponse.headers)) {
++      if (name === "set-cookie") {
++        let cookies = cookie.parse(value.split(";")[0] || "");
++        Object.assign(newCookieValues, cookies);
++      }
++    }
++    let newCookie = Object.entries(newCookieValues).map(([name, value]) => `${name}=${encodeURIComponent(value)}`).join("; ");
++    request.headers.set("Cookie", newCookie);
++  }
++
+   let routeLoaderResults = await Promise.allSettled(matchesToLoad.map(match => match.route.module.loader ? data.callRouteLoader({
+     loadContext,
+     match,

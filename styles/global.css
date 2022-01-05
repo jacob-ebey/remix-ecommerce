@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.three-product-grid-primary,
+.three-product-grid-secondary {
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 0px 0px;
+}
+.three-product-grid-primary {
+  grid-template-areas:
+    "item-0 item-0 item-1"
+    "item-0 item-0 item-2";
+}
+.three-product-grid-secondary {
+  grid-template-areas:
+    "item-1 item-0 item-0"
+    "item-2 item-0 item-0";
+}
+.three-product-grid__item-0 {
+  grid-area: item-0;
+}
+.three-product-grid__item-1 {
+  grid-area: item-1;
+}
+.three-product-grid__item-2 {
+  grid-area: item-2;
+}
+
+.product-details-grid {
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 0px 0px;
+
+  grid-template-areas:
+    "media media details"
+    "media media details";
+}
+.product-details-grid__media {
+  grid-area: media;
+}
+.product-details-grid__details {
+  grid-area: details;
+}

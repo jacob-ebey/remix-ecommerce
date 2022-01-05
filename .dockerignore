@@ -1,0 +1,13 @@
+/.cache
+/.env
+/build
+/public/build
+/node_modules
+
+/.env.example
+/docker-compose.yml
+/README.md
+/.dockerignore
+/.gitignore
+/Dockerfile
+/fly.toml
