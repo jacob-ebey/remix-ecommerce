@@ -27,7 +27,7 @@ function ScrollingProductItem({
   return (
     <li className="lg:pr-12 relative">
       <Link
-        to={to}
+        prefetch="intent" to={to}
         className="group block aspect-square overflow-hidden w-screen max-w-sm"
         tabIndex={disabled ? -1 : undefined}
       >
@@ -65,7 +65,7 @@ export function ScrollingProductList({
             key={product.id}
             image={product.image}
             title={product.title}
-            to={product.to}
+            prefetch="intent" to={product.to}
           />
         )),
     [products]
@@ -80,7 +80,7 @@ export function ScrollingProductList({
             key={product.id}
             image={product.image}
             title={product.title}
-            to={product.to}
+            prefetch="intent" to={product.to}
             disabled
           />
         )),

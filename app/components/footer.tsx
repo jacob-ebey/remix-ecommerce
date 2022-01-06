@@ -51,7 +51,7 @@ export function Footer({
             <li key={page.id}>
               <Link
                 className="focus:text-gray-300 hover:text-gray-300"
-                to={page.to}
+                prefetch="intent" to={page.to}
               >
                 {page.title}
               </Link>

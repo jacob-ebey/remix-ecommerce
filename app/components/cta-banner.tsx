@@ -27,7 +27,7 @@ export function CtaBanner({
       <div className="flex-1 mt-3 lg:ml-8">
         <p className="text-xl font-light mb-4">{description}</p>
         <p>
-          <Link className="group inline-flex items-center" to={ctaTo}>
+          <Link className="group inline-flex items-center" prefetch="intent" to={ctaTo}>
             <span className="text-xl font-semibold group-focus:underline group-hover:underline focus:underline hover:underline">
               {ctaText}
             </span>

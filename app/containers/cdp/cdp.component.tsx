@@ -14,7 +14,7 @@ function ThreeProductGridItem({ product }: { product: CDPProduct }) {
   return (
     <li key={product.id}>
       <div className="group block relative aspect-square overflow-hidden bg-zinc-800">
-        <Link className="block group" to={product.to} aria-labelledby={id}>
+        <Link className="block group" prefetch="intent" to={product.to} aria-labelledby={id}>
           <OptimizedImage
             className="object-cover w-full h-full transform transition duration-500 motion-safe:group-focus:scale-110 motion-safe:group-hover:scale-110"
             src={product.image}
@@ -40,7 +40,7 @@ function ThreeProductGridItem({ product }: { product: CDPProduct }) {
         <div className="absolute top-0 left-0 right-0">
           <div className="flex">
             <Link
-              to={product.to}
+              prefetch="intent" to={product.to}
               className="group-tpgi block flex-1"
               tabIndex={-1}
               id={id}
@@ -105,7 +105,7 @@ export default function CDP() {
               <Link
                 aria-selected={cat.slug !== category}
                 className="focus:underline hover:underline whitespace-nowrap"
-                to={(() => {
+                prefetch="intent" to={(() => {
                   let params = new URLSearchParams(location.search);
                   params.delete("q");
                   params.set("category", cat.slug);
@@ -131,7 +131,7 @@ export default function CDP() {
               <Link
                 aria-selected={sortBy.value !== sort}
                 className="focus:underline hover:underline whitespace-nowrap"
-                to={(() => {
+                prefetch="intent" to={(() => {
                   let params = new URLSearchParams(location.search);
                   params.set("sort", sortBy.value);
                   return location.pathname + "?" + params.toString();

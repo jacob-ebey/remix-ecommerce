@@ -44,7 +44,7 @@ export function Navbar({
     <nav className="p-4 lg:px-6 border-b border-zinc-700">
       <div className="flex">
         <div className="flex items-center flex-1">
-          <Link to={`/${lang}`}>
+          <Link prefetch="intent" to={`/${lang}`}>
             {translations ? (
               <span className="sr-only">{translations.Home}</span>
             ) : null}
@@ -80,7 +80,7 @@ export function Navbar({
               <li key={category.name + "|" + i} className="mx-2">
                 <Link
                   className="whitespace-nowrap hover:text-gray-300"
-                  to={category.to}
+                  prefetch="intent" to={category.to}
                 >
                   {category.name}
                 </Link>
@@ -100,7 +100,7 @@ export function Navbar({
         </div>
         <div className="flex items-center">
           <Link
-            to={`/${lang}/cart`}
+            prefetch="intent" to={`/${lang}/cart`}
             className="group relative inline-block hover:text-gray-300 ml-4"
             onClick={(event) => {
               event.preventDefault();
@@ -121,7 +121,7 @@ export function Navbar({
             )}
           </Link>
           <Link
-            to={`/${lang}/wishlist`}
+            prefetch="intent" to={`/${lang}/wishlist`}
             className="hover:text-gray-300 ml-4"
             onClick={(event) => {
               event.preventDefault();
@@ -182,7 +182,7 @@ export function Navbar({
                           <Link
                             onClick={() => close()}
                             className="text-xl text-blue-400 hover:text-blue-500"
-                            to={category.to}
+                            prefetch="intent" to={category.to}
                           >
                             {category.name}
                           </Link>
