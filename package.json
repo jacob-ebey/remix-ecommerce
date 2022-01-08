@@ -11,7 +11,6 @@
     "dev": "dotenv -- remix dev",
     "start": "remix-serve build",
     "postinstall": "run-s setup:*",
-    "setup:patch-package": "patch-package",
     "setup:install-sharp": "(cd ./node_modules/sharp && npm run install)",
     "setup:remix": "remix setup node"
   },
@@ -40,7 +39,6 @@
     "cssnano": "^5.0.14",
     "dotenv-cli": "^4.1.1",
     "npm-run-all": "^4.1.5",
-    "patch-package": "^6.4.7",
     "postcss": "^8.4.5",
     "postcss-cli": "^9.1.0",
     "postcss-load-config": "^3.1.0",
