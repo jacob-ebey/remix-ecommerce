@@ -1,8 +1,5 @@
 FROM node:17-bullseye-slim as base
 
-# install open ssl for prisma
-# RUN apt-get update && apt-get install -y openssl 
-
 ENV NODE_ENV=production
 ENV PORT=8080
 
@@ -12,8 +9,6 @@ FROM base as deps
 RUN mkdir /app/
 WORKDIR /app/
 
-# ADD prisma .
-ADD patches .
 ADD package.json package-lock.json ./
 RUN npm install --production=false
 
