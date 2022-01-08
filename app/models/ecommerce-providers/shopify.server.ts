@@ -6,6 +6,7 @@ import type {
   Page,
   Product,
   FullCartItem,
+  FullWishlistItem,
 } from "../ecommerce-provider.server";
 import type { RequestResponseCache } from "../request-response-cache.server";
 
@@ -74,8 +75,8 @@ export function createShopifyProvider({
           quantity: itemInput.quantity,
           variantId: itemInput.variantId,
           info: {
+            defaultVariantId: item.id,
             id: item.product.id,
-            favorited: false,
             formattedPrice: formatPrice(item.priceV2),
             image:
               item.image?.originalSrc ||
@@ -148,11 +149,11 @@ export function createShopifyProvider({
 
       let products = json.data.products.edges.map(
         ({
-          node: { id, handle, title, images, priceRange },
+          node: { id, handle, title, images, priceRange, variants },
         }: any): Product => ({
-          favorited: false,
           formattedPrice: formatPrice(priceRange.minVariantPrice),
           id,
+          defaultVariantId: variants.edges[0].node.id,
           image: images.edges[0].node.originalSrc,
           slug: handle,
           title,
@@ -165,7 +166,7 @@ export function createShopifyProvider({
       let json = await query(locale, getPageQuery, { query: `handle:${slug}` });
       let page = json.data.pages.edges[0]?.node;
       if (!page) {
-        return null;
+        return undefined;
       }
 
       return {
@@ -190,7 +191,7 @@ export function createShopifyProvider({
       let json = await query(locale, getProductQuery, { slug });
 
       if (!json.data.productByHandle) {
-        return null;
+        return undefined;
       }
 
       let {
@@ -212,10 +213,14 @@ export function createShopifyProvider({
           .map((option) => [option.name, option.value])
       );
 
+      let defaultVariantId: string | undefined = undefined;
       let selectedVariantId: string | undefined;
       let availableForSale = false;
       let price = priceRange.minVariantPrice;
       for (let { node } of variants.edges) {
+        if (typeof defaultVariantId === "undefined") {
+          defaultVariantId = node.id;
+        }
         if (
           node.selectedOptions.every(
             (option: any) =>
@@ -230,9 +235,9 @@ export function createShopifyProvider({
       }
 
       return {
-        favorited: false,
         formattedPrice: formatPrice(price),
         id,
+        defaultVariantId: defaultVariantId!,
         image: images.edges[0].node.originalSrc,
         images: images.edges.map(
           ({ node: { originalSrc } }: any) => originalSrc
@@ -301,11 +306,11 @@ export function createShopifyProvider({
 
       let products = edges.map(
         ({
-          node: { id, handle, title, images, priceRange },
+          node: { id, handle, title, images, priceRange, variants },
         }: any): Product => ({
-          favorited: false,
           formattedPrice: formatPrice(priceRange.minVariantPrice),
           id,
+          defaultVariantId: variants.edges[0].node.id,
           image: images.edges[0].node.originalSrc,
           slug: handle,
           title,
@@ -339,6 +344,47 @@ export function createShopifyProvider({
           value: "price-desc",
         },
       ];
+    },
+    async getWishlistInfo(locale, items) {
+      let json = await query(locale, getProductVariantsQuery, {
+        ids: items.map((item) => item.variantId),
+      });
+
+      if (!json?.data?.nodes) {
+        return undefined;
+      }
+
+      let itemsMap = new Map(items.map((item) => [item.variantId, item]));
+      let fullItems: FullWishlistItem[] = [];
+      for (let item of json.data.nodes) {
+        let itemInput = itemsMap.get(item.id);
+        if (!itemInput) {
+          continue;
+        }
+
+        fullItems.push({
+          productId: item.product.id,
+          quantity: itemInput.quantity,
+          variantId: itemInput.variantId,
+          info: {
+            defaultVariantId: item.id,
+            id: item.product.id,
+            formattedPrice: formatPrice(item.priceV2),
+            image:
+              item.image?.originalSrc ||
+              item.product.images.edges[0].node.originalSrc,
+            title: item.product.title,
+            formattedOptions: item.title,
+            slug: item.product.handle,
+          },
+        });
+      }
+
+      if (!fullItems.length) {
+        return undefined;
+      }
+
+      return fullItems;
     },
   };
 }
@@ -435,19 +481,6 @@ let getPageQuery = /* GraphQL */ `
     }
   }
 `;
-// let getPageQuery = /* GraphQL */ `
-//   query getPage($handle: ID!) {
-//     node(handle: $handle) {
-//       id
-//       ... on Page {
-//         title
-//         handle
-//         body
-//         bodySummary
-//       }
-//     }
-//   }
-// `;
 
 let productConnectionFragment = /* GraphQL */ `
   fragment productConnection on ProductConnection {
@@ -478,6 +511,13 @@ let productConnectionFragment = /* GraphQL */ `
               altText
               width
               height
+            }
+          }
+        }
+        variants(first: 1) {
+          edges {
+            node {
+              id
             }
           }
         }

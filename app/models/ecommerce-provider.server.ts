@@ -17,19 +17,29 @@ export interface CartInfo {
   items: FullCartItem[];
 }
 
+export interface WishlistItem {
+  productId: string;
+  variantId: string;
+  quantity: number;
+}
+
+export interface FullWishlistItem extends WishlistItem {
+  info: Product;
+}
+
 export interface Category {
   name: string;
   slug: string;
 }
 
 export interface Product {
-  id: string | number;
+  id: string;
   title: string;
   formattedPrice: string;
   formattedOptions?: string;
-  favorited: boolean;
   image: string;
   slug: string;
+  defaultVariantId: string;
 }
 
 export interface ProductOption {
@@ -47,7 +57,7 @@ export interface FullProduct extends Product {
 }
 
 export interface Page {
-  id: string | number;
+  id: string;
   slug: string;
   title: string;
 }
@@ -75,13 +85,13 @@ export interface EcommerceProvider {
   getCategories(language: Language, count: number): Promise<Category[]>;
   getCheckoutUrl(language: Language, items: CartItem[]): Promise<string>;
   getFeaturedProducts(language: Language): Promise<Product[]>;
-  getPage(language: Language, slug: string): Promise<FullPage | null>;
+  getPage(language: Language, slug: string): Promise<FullPage | undefined>;
   getPages(language: Language): Promise<Page[]>;
   getProduct(
     language: Language,
     slug: string,
     selectedOptions?: SelectedProductOption[]
-  ): Promise<FullProduct | null>;
+  ): Promise<FullProduct | undefined>;
   getProducts(
     language: Language,
     category?: string,
@@ -89,4 +99,8 @@ export interface EcommerceProvider {
     search?: string
   ): Promise<Product[]>;
   getSortByOptions(language: Language): Promise<SortByOption[]>;
+  getWishlistInfo(
+    locale: Language,
+    items: WishlistItem[]
+  ): Promise<FullWishlistItem[] | undefined>;
 }

@@ -10,7 +10,7 @@ import commerce from "~/commerce.server";
 import { getSession } from "~/session.server";
 
 export type CDPProduct = {
-  id: string | number;
+  id: string;
   title: string;
   formattedPrice: string;
   favorited: boolean;
@@ -36,11 +36,16 @@ export let loader: LoaderFunction = async ({ request, params }) => {
   let sort = url.searchParams.get("sort") || undefined;
   let search = url.searchParams.get("q") || undefined;
 
-  let [categories, sortByOptions, products] = await Promise.all([
+  let [categories, sortByOptions, products, wishlist] = await Promise.all([
     commerce.getCategories(lang, 250),
     commerce.getSortByOptions(lang),
     commerce.getProducts(lang, category, sort, search),
+    session.getWishlist(),
   ]);
+
+  let wishlistHasProduct = new Set(
+    wishlist.map<string>((item) => item.productId)
+  );
 
   return json<LoaderData>({
     category,
@@ -49,7 +54,7 @@ export let loader: LoaderFunction = async ({ request, params }) => {
     search,
     sortByOptions,
     products: products.map((product) => ({
-      favorited: product.favorited,
+      favorited: wishlistHasProduct.has(product.id),
       formattedPrice: product.formattedPrice,
       id: product.id,
       image: product.image,

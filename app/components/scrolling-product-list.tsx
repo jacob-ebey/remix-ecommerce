@@ -7,7 +7,7 @@ import cn from "classnames";
 import { OptimizedImage } from "./optimized-image";
 
 export type ScrollingProductListProduct = {
-  id: string | number;
+  id: string;
   title: ReactNode;
   image: string;
   to: To;
@@ -27,7 +27,8 @@ function ScrollingProductItem({
   return (
     <li className="lg:pr-12 relative">
       <Link
-        prefetch="intent" to={to}
+        prefetch="intent"
+        to={to}
         className="group block aspect-square overflow-hidden w-screen max-w-sm"
         tabIndex={disabled ? -1 : undefined}
       >
@@ -65,7 +66,7 @@ export function ScrollingProductList({
             key={product.id}
             image={product.image}
             title={product.title}
-            prefetch="intent" to={product.to}
+            to={product.to}
           />
         )),
     [products]
@@ -80,7 +81,7 @@ export function ScrollingProductList({
             key={product.id}
             image={product.image}
             title={product.title}
-            prefetch="intent" to={product.to}
+            to={product.to}
             disabled
           />
         )),

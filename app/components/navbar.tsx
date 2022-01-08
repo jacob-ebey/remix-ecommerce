@@ -23,8 +23,10 @@ export function Navbar({
   categories,
   translations,
   cartCount,
+  wishlistCount,
 }: {
   cartCount?: number;
+  wishlistCount?: number;
   onOpenCart: () => void;
   onOpenWishlist: () => void;
   lang: Language;
@@ -80,7 +82,8 @@ export function Navbar({
               <li key={category.name + "|" + i} className="mx-2">
                 <Link
                   className="whitespace-nowrap hover:text-gray-300"
-                  prefetch="intent" to={category.to}
+                  prefetch="intent"
+                  to={category.to}
                 >
                   {category.name}
                 </Link>
@@ -100,7 +103,8 @@ export function Navbar({
         </div>
         <div className="flex items-center">
           <Link
-            prefetch="intent" to={`/${lang}/cart`}
+            prefetch="intent"
+            to={`/${lang}/cart`}
             className="group relative inline-block hover:text-gray-300 ml-4"
             onClick={(event) => {
               event.preventDefault();
@@ -121,8 +125,9 @@ export function Navbar({
             )}
           </Link>
           <Link
-            prefetch="intent" to={`/${lang}/wishlist`}
-            className="hover:text-gray-300 ml-4"
+            prefetch="intent"
+            to={`/${lang}/wishlist`}
+            className="group relative hover:text-gray-300 ml-4"
             onClick={(event) => {
               event.preventDefault();
               onOpenWishlist();
@@ -132,6 +137,14 @@ export function Navbar({
               {translations ? translations["Wishlist"] : null}
             </span>
             <WishlistIcon className="w-8 h-8" />
+            {!!wishlistCount && (
+              <span
+                style={{ lineHeight: "0.75rem" }}
+                className="absolute bottom-0 left-0 translate translate-y-[25%] translate-x-[-25%] inline-flex items-center justify-center px-[0.25rem] py-[0.125rem] text-xs text-zinc-900 bg-gray-50 group-hover:bg-gray-300 rounded-full"
+              >
+                {wishlistCount}
+              </span>
+            )}
           </Link>
           <Popover className="lg:hidden relative flex items-center ml-4">
             {({ close }) => (
@@ -182,7 +195,8 @@ export function Navbar({
                           <Link
                             onClick={() => close()}
                             className="text-xl text-blue-400 hover:text-blue-500"
-                            prefetch="intent" to={category.to}
+                            prefetch="intent"
+                            to={category.to}
                           >
                             {category.name}
                           </Link>

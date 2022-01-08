@@ -33,6 +33,11 @@ let LanguageDialog = lazy(() =>
     default: LanguageDialog,
   }))
 );
+let WishlistPopover = lazy(() =>
+  import("~/components/wishlist-popover").then(({ WishlistPopover }) => ({
+    default: WishlistPopover,
+  }))
+);
 
 export const meta: MetaFunction = () => {
   return {
@@ -60,10 +65,11 @@ export function Document({
   children: ReactNode;
   loaderData?: LoaderData;
 }) {
-  let { cart, categories, lang, pages, translations } = loaderData || {
-    lang: "en",
-    pages: [],
-  };
+  let { cart, categories, lang, pages, translations, wishlist } =
+    loaderData || {
+      lang: "en",
+      pages: [],
+    };
 
   let allCategories = useMemo(() => {
     let results: NavbarCategory[] = translations
@@ -89,6 +95,11 @@ export function Document({
     [cart]
   );
 
+  let wishlistCount = useMemo(
+    () => wishlist?.reduce((sum, item) => sum + item.quantity, 0),
+    [wishlist]
+  );
+
   return (
     <html lang={lang} className="bg-zinc-900 text-gray-100">
       <head>
@@ -100,6 +111,7 @@ export function Document({
       <body className="flex flex-col min-h-screen">
         <Navbar
           cartCount={cartCount}
+          wishlistCount={wishlistCount}
           lang={lang}
           logoHref={logoHref}
           storeName={translations?.["Store Name"]}
@@ -120,6 +132,20 @@ export function Document({
           <ClientOnly>
             <Suspense fallback="">
               <LanguageDialog lang={lang} translations={translations} />
+            </Suspense>
+          </ClientOnly>
+        ) : null}
+
+        {translations ? (
+          <ClientOnly>
+            <Suspense fallback="">
+              <WishlistPopover
+                wishlistCount={wishlistCount}
+                wishlist={wishlist}
+                open={wishlistOpen}
+                translations={translations}
+                onClose={() => setWishlistOpen(false)}
+              />
             </Suspense>
           </ClientOnly>
         ) : null}

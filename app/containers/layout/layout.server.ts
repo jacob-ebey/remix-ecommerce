@@ -5,7 +5,10 @@ import commerce from "~/commerce.server";
 import { getSession } from "~/session.server";
 import { getTranslations } from "~/translations.server";
 import type { PickTranslations } from "~/translations.server";
-import type { CartInfo } from "~/models/ecommerce-provider.server";
+import type {
+  CartInfo,
+  FullWishlistItem,
+} from "~/models/ecommerce-provider.server";
 import type { Language } from "~/models/language";
 
 import type { FooterPage } from "~/components/footer";
@@ -16,6 +19,7 @@ export type LoaderData = {
   lang: Language;
   categories: NavbarCategory[];
   pages: FooterPage[];
+  wishlist?: FullWishlistItem[];
   translations: PickTranslations<
     | "All"
     | "Cart"
@@ -40,18 +44,24 @@ export type LoaderData = {
     | "Total"
     | "Taxes"
     | "Shipping"
+    | "Your wishlist is empty"
+    | "Remove from wishlist"
+    | "Move to cart"
   >;
 };
 
 export let loader: LoaderFunction = async ({ request, params }) => {
   let session = await getSession(request, params);
   let lang = session.getLanguage();
-  let [categories, pages, cart] = await Promise.all([
+  let [categories, pages, cart, wishlist] = await Promise.all([
     commerce.getCategories(lang, 2),
     commerce.getPages(lang),
     session
       .getCart()
       .then((cartItems) => commerce.getCartInfo(lang, cartItems)),
+    session
+      .getWishlist()
+      .then((wishlistItems) => commerce.getWishlistInfo(lang, wishlistItems)),
   ]);
 
   let translations = getTranslations(lang, [
@@ -78,6 +88,9 @@ export let loader: LoaderFunction = async ({ request, params }) => {
     "Total",
     "Taxes",
     "Shipping",
+    "Your wishlist is empty",
+    "Remove from wishlist",
+    "Move to cart",
   ]);
 
   return json<LoaderData>({
@@ -102,5 +115,6 @@ export let loader: LoaderFunction = async ({ request, params }) => {
       })),
     ],
     translations,
+    wishlist,
   });
 };

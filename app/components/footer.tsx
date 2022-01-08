@@ -11,7 +11,7 @@ import { ChevronUp, GithubIcon } from "./icons";
 import { OptimizedImage } from "./optimized-image";
 
 export type FooterPage = {
-  id: string | number;
+  id: string;
   title: string;
   to: To;
 };

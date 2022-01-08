@@ -29,6 +29,7 @@ export default function IndexPage() {
           () => chunkProducts(0, 3, featuredProducts),
           [featuredProducts]
         )}
+        translations={translations}
       />
       <ScrollingProductList
         variant="secondary"
@@ -50,6 +51,7 @@ export default function IndexPage() {
           () => chunkProducts(6, 3, featuredProducts),
           [featuredProducts]
         )}
+        translations={translations}
       />
       <ScrollingProductList
         variant="primary"

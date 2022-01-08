@@ -11,21 +11,33 @@ import type { ThreeProductGridProduct } from "~/components/three-product-grid";
 export type LoaderData = {
   featuredProducts: ThreeProductGridProduct[];
   translations: PickTranslations<
-    "MockCTADescription" | "MockCTAHeadline" | "MockCTALink"
+    | "MockCTADescription"
+    | "MockCTAHeadline"
+    | "MockCTALink"
+    | "Add to wishlist"
+    | "Remove from wishlist"
   >;
 };
 
 export let loader: LoaderFunction = async ({ request, params }) => {
   let session = await getSession(request, params);
   let lang = session.getLanguage();
-  let featuredProducts = await commerce.getFeaturedProducts(lang);
+  let [featuredProducts, wishlist] = await Promise.all([
+    commerce.getFeaturedProducts(lang),
+    session.getWishlist(),
+  ]);
+
+  let wishlistHasProduct = new Set(
+    wishlist.map<string>((item) => item.productId)
+  );
 
   return json<LoaderData>({
     featuredProducts: featuredProducts.map(
-      ({ favorited, formattedPrice, id, image, slug, title }) => ({
-        favorited,
+      ({ formattedPrice, id, image, slug, title, defaultVariantId }) => ({
+        favorited: wishlistHasProduct.has(id),
         formattedPrice,
         id,
+        defaultVariantId,
         image,
         title,
         to: `/${lang}/product/${slug}`,
@@ -35,6 +47,8 @@ export let loader: LoaderFunction = async ({ request, params }) => {
       "MockCTADescription",
       "MockCTAHeadline",
       "MockCTALink",
+      "Add to wishlist",
+      "Remove from wishlist",
     ]),
   });
 };

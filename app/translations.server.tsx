@@ -144,6 +144,22 @@ let translations = {
     en: "Shipping",
     es: "Envío",
   },
+  "Your wishlist is empty": {
+    en: "Your wishlist is empty",
+    es: "Tu lista de deseos está vacía",
+  },
+  "Remove from wishlist": {
+    en: "Remove from wishlist",
+    es: "Eliminar de la lista de deseos",
+  },
+  "Move to cart": {
+    en: "Move to cart",
+    es: "Mover al carrito",
+  },
+  "Add to wishlist": {
+    en: "Add to wishlist",
+    es: "Añadir a la lista de deseos",
+  },
 
   MockCTAHeadline: {
     en: "Dessert dragée halvah croissant.",

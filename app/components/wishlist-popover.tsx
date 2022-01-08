@@ -1,38 +1,33 @@
 import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 
-import { CartInfo } from "~/models/ecommerce-provider.server";
+import { FullWishlistItem } from "~/models/ecommerce-provider.server";
 import { PickTranslations } from "~/translations.server";
 
-import { CartIcon, CloseIcon } from "./icons";
+import { CloseIcon, WishlistIcon } from "./icons";
 
-import { CartListItem } from "./cart-listitem";
-import { CheckoutForm } from "./checkout-form";
+import { WishlistListItem } from "./wishlist-listitem";
 
-export function CartPopover({
-  cart,
-  cartCount,
+export function WishlistPopover({
+  wishlist,
+  wishlistCount,
   open,
   onClose,
   translations,
 }: {
-  cart?: CartInfo;
-  cartCount?: number;
+  wishlist?: FullWishlistItem[];
+  wishlistCount?: number;
   open: boolean;
   onClose: () => void;
   translations: PickTranslations<
-    | "Cart"
+    | "Wishlist"
     | "Close"
-    | "Your cart is empty"
+    | "Your wishlist is empty"
     | "Quantity: $1"
-    | "Remove from cart"
+    | "Remove from wishlist"
     | "Subtract item"
     | "Add item"
-    | "Proceed to checkout"
-    | "Subtotal"
-    | "Total"
-    | "Taxes"
-    | "Shipping"
+    | "Move to cart"
   >;
 }) {
   return (
@@ -73,28 +68,28 @@ export function CartPopover({
                   <span className="ml-2">{translations.Close}</span>
                 </button>
                 <span className="relative flex items-center">
-                  <CartIcon className="w-8 h-8" />
-                  {!!cartCount && (
+                  <WishlistIcon className="w-8 h-8" />
+                  {!!wishlistCount && (
                     <span
                       style={{ lineHeight: "0.75rem" }}
                       className="absolute bottom-0 left-0 translate translate-y-[25%] translate-x-[-25%] inline-flex items-center justify-center px-[0.25rem] py-[0.125rem] text-xs text-zinc-900 bg-gray-50 rounded-full"
                     >
-                      {cartCount}
+                      {wishlistCount}
                     </span>
                   )}
                 </span>
               </div>
               <div className="flex flex-col flex-1 overflow-y-auto">
-                {!cart?.items ? (
+                {!wishlist ? (
                   <div className="h-full flex flex-col justify-center items-center p-4 lg:px-6">
                     <span className="border border-dashed border-primary rounded-full flex items-center justify-center w-24 h-24 bg-secondary text-secondary">
-                      <CartIcon className="block w-8 h-8" />
+                      <WishlistIcon className="block w-8 h-8" />
                     </span>
                     <Dialog.Title
                       as="h1"
                       className="pt-6 text-2xl font-bold tracking-wide text-center"
                     >
-                      {translations["Your cart is empty"]}
+                      {translations["Your wishlist is empty"]}
                     </Dialog.Title>
                   </div>
                 ) : (
@@ -104,11 +99,11 @@ export function CartPopover({
                         as="h1"
                         className="text-2xl font-semibold mb-6"
                       >
-                        {translations.Cart}
+                        {translations.Wishlist}
                       </Dialog.Title>
                       <ul>
-                        {cart.items.map((item) => (
-                          <CartListItem
+                        {wishlist.map((item) => (
+                          <WishlistListItem
                             key={item.variantId}
                             formattedOptions={item.info.formattedOptions}
                             quantity={item.quantity}
@@ -116,16 +111,12 @@ export function CartPopover({
                             image={item.info.image}
                             title={item.info.title}
                             variantId={item.variantId}
+                            productId={item.productId}
                             translations={translations}
                           />
                         ))}
                       </ul>
                     </div>
-                    <CheckoutForm
-                      className="sticky bottom-0 border-t border-zinc-700 py-4 mx-4 lg:mx-6 pt-4 bg-zinc-900"
-                      cart={cart}
-                      translations={translations}
-                    />
                   </>
                 )}
               </div>

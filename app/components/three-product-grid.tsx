@@ -1,15 +1,17 @@
 import type { ReactNode } from "react";
 import { useMemo } from "react";
-import { Link } from "remix";
+import { Link, useFetcher, useLocation } from "remix";
 import type { To } from "react-router-dom";
 import cn from "classnames";
 import { useId } from "@reach/auto-id";
 
 import { WishlistIcon } from "./icons";
 import { OptimizedImage } from "./optimized-image";
+import { PickTranslations } from "~/translations.server";
 
 export type ThreeProductGridProduct = {
-  id: string | number;
+  id: string;
+  defaultVariantId: string;
   title: ReactNode;
   formattedPrice: ReactNode;
   favorited: boolean;
@@ -22,13 +24,17 @@ function ThreeProductGridItem({
   wishlistColors,
   product,
   index,
+  translations,
 }: {
   backgroundColor: string;
   wishlistColors: string[];
   product: ThreeProductGridProduct;
   index: number;
+  translations: PickTranslations<"Add to wishlist" | "Remove from wishlist">;
 }) {
   let id = `three-product-grid-item-${useId()}`;
+  let { Form } = useFetcher();
+  let location = useLocation();
 
   return (
     <li key={product.id} className={`three-product-grid__item-${index % 3}`}>
@@ -38,7 +44,12 @@ function ThreeProductGridItem({
           backgroundColor
         )}
       >
-        <Link className="block group" prefetch="intent" to={product.to} aria-labelledby={id}>
+        <Link
+          className="block group"
+          prefetch="intent"
+          to={product.to}
+          aria-labelledby={id}
+        >
           <OptimizedImage
             className="object-cover w-full h-full transform transition duration-500 motion-safe:group-focus:scale-110 motion-safe:group-hover:scale-110"
             src={product.image}
@@ -87,7 +98,8 @@ function ThreeProductGridItem({
         <div className="absolute top-0 left-0 right-0">
           <div className="flex">
             <Link
-              prefetch="intent" to={product.to}
+              prefetch="intent"
+              to={product.to}
               className="group-tpgi block flex-1"
               tabIndex={-1}
               id={id}
@@ -100,20 +112,45 @@ function ThreeProductGridItem({
                 {product.formattedPrice}
               </p>
             </Link>
-            <div>
+            <Form replace action="/wishlist" method="post">
+              <input
+                key={product.favorited.toString()}
+                type="hidden"
+                name="_action"
+                defaultValue={product.favorited ? "delete" : "add"}
+              />
+              <input
+                type="hidden"
+                name="redirect"
+                defaultValue={location.pathname + location.search}
+              />
+              <input
+                key={product.id}
+                type="hidden"
+                name="productId"
+                defaultValue={product.id}
+              />
+              <input
+                key={product.defaultVariantId}
+                type="hidden"
+                name="variantId"
+                defaultValue={product.defaultVariantId}
+              />
+
               <button
                 className={cn(
                   "p-2 bg-zinc-900 focus:bg-zinc-900 hover:bg-zinc-900 transition-colors ease-in-out duration-300",
-                  ...wishlistColors
+                  product.favorited ? "text-red-brand" : wishlistColors
                 )}
-                onClick={() => alert("wishlist")}
               >
                 <span className="sr-only">
-                  Add "{product.title}" to wishlist
+                  {product.favorited
+                    ? translations["Remove from wishlist"]
+                    : translations["Add to wishlist"]}
                 </span>
                 <WishlistIcon className="w-8 h-8" />
               </button>
-            </div>
+            </Form>
           </div>
         </div>
       </div>
@@ -124,9 +161,11 @@ function ThreeProductGridItem({
 export function ThreeProductGrid({
   products,
   variant = "primary",
+  translations,
 }: {
   products: ThreeProductGridProduct[];
   variant?: "primary" | "secondary";
+  translations: PickTranslations<"Add to wishlist" | "Remove from wishlist">;
 }) {
   let [backgroundColors, wishlistColors] = useMemo(
     () =>
@@ -176,6 +215,7 @@ export function ThreeProductGrid({
             index={index}
             backgroundColor={backgroundColors[index % 3]}
             wishlistColors={wishlistColors[index % 3]}
+            translations={translations}
           />
         ))}
       </ul>
