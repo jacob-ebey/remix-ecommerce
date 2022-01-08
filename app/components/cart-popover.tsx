@@ -1,7 +1,5 @@
 import { Fragment } from "react";
-import { Form } from "remix";
 import { Dialog, Transition } from "@headlessui/react";
-import cn from "classnames";
 
 import { CartInfo } from "~/models/ecommerce-provider.server";
 import { PickTranslations } from "~/translations.server";

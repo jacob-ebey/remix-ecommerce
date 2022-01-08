@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useFetcher } from "remix";
+import { useFetcher, useLocation } from "remix";
 import cn from "classnames";
 
 import { PickTranslations } from "~/translations.server";
@@ -27,6 +27,7 @@ export function CartListItem({
     "Add item" | "Remove from cart" | "Subtract item" | "Quantity: $1"
   >;
 }) {
+  let location = useLocation();
   let { Form } = useFetcher();
 
   return (
@@ -62,8 +63,14 @@ export function CartListItem({
         <p className="text-sm">{formattedPrice}</p>
       </div>
       <div className="flex mt-2">
-        <Form action="/cart" method="post">
+        <Form method="post" action="/cart">
           <input type="hidden" name="_action" defaultValue="delete" />
+          <input
+            key={location.pathname + location.search}
+            type="hidden"
+            name="redirect"
+            defaultValue={location.pathname + location.search}
+          />
           <input
             key={variantId}
             type="hidden"
@@ -86,6 +93,12 @@ export function CartListItem({
         </div>
         <Form action="/cart" method="post">
           <input type="hidden" name="_action" defaultValue="set-quantity" />
+          <input
+            key={location.pathname + location.search}
+            type="hidden"
+            name="redirect"
+            defaultValue={location.pathname + location.search}
+          />
           <input
             key={variantId}
             type="hidden"
@@ -113,6 +126,12 @@ export function CartListItem({
         </Form>
         <Form action="/cart" method="post">
           <input type="hidden" name="_action" defaultValue="set-quantity" />
+          <input
+            key={location.pathname + location.search}
+            type="hidden"
+            name="redirect"
+            defaultValue={location.pathname + location.search}
+          />
           <input
             key={variantId}
             type="hidden"

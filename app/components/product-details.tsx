@@ -78,12 +78,13 @@ export function ProductDetails({
                 ) : null}
               </Form>
             ) : null}
-            <Form
-              replace
-              method="post"
-              action={location.pathname + location.search}
-              className="mt-8"
-            >
+            <Form replace method="post" className="mt-8">
+              <input
+                key={location.pathname + location.search}
+                defaultValue={location.pathname + location.search}
+                type="hidden"
+                name="redirect"
+              />
               <input
                 key={product.selectedVariantId}
                 defaultValue={product.selectedVariantId}

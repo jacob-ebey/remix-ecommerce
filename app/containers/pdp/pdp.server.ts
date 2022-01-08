@@ -1,4 +1,4 @@
-import { json } from "remix";
+import { json, redirect } from "remix";
 import type { ActionFunction, HeadersFunction, LoaderFunction } from "remix";
 
 import commerce from "~/commerce.server";
@@ -6,6 +6,7 @@ import { addToCart, getSession } from "~/session.server";
 import { getTranslations } from "~/translations.server";
 import type { PickTranslations } from "~/translations.server";
 import type { FullProduct } from "~/models/ecommerce-provider.server";
+import { validateRedirect } from "~/utils/redirect.server";
 
 export let headers: HeadersFunction = ({ actionHeaders }) => {
   return actionHeaders;
@@ -17,15 +18,19 @@ export let action: ActionFunction = async ({ request, params }) => {
     getSession(request, params),
   ]);
   let formData = new URLSearchParams(body);
+  let redirectTo = validateRedirect(
+    formData.get("redirect"),
+    `/product/${params.slug}`
+  );
   let variantId = formData.get("variantId");
   if (!variantId) {
-    return null;
+    return redirect(redirectTo);
   }
 
   let cart = await session.getCart();
   cart = addToCart(cart, variantId, 1);
   await session.setCart(cart);
-  return json(null, {
+  return redirect(redirectTo, {
     headers: {
       "Set-Cookie": await session.commitSession(),
     },

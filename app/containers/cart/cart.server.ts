@@ -1,10 +1,11 @@
 import { json, redirect } from "remix";
 import type { ActionFunction, HeadersFunction, LoaderFunction } from "remix";
 
-import commerce from "~/commerce.server";
-import type { CartInfo } from "~/models/ecommerce-provider.server";
 import { updateCartItem, removeCartItem, getSession } from "~/session.server";
 import { getTranslations, PickTranslations } from "~/translations.server";
+import commerce from "~/commerce.server";
+import type { CartInfo } from "~/models/ecommerce-provider.server";
+import { validateRedirect } from "~/utils/redirect.server";
 
 export let headers: HeadersFunction = ({ actionHeaders }) => {
   return actionHeaders;
@@ -17,8 +18,8 @@ export let action: ActionFunction = async ({ request, params }) => {
   ]);
 
   let formData = new URLSearchParams(body);
+  let redirectTo = validateRedirect(formData.get("redirect"), "/cart");
   let action = formData.get("_action");
-  console.log(Array.from(formData));
 
   try {
     let cart = await session.getCart();
@@ -45,7 +46,7 @@ export let action: ActionFunction = async ({ request, params }) => {
     }
 
     await session.setCart(cart);
-    return json(null, {
+    return redirect(redirectTo, {
       headers: {
         "Set-Cookie": await session.commitSession(),
       },
@@ -54,7 +55,7 @@ export let action: ActionFunction = async ({ request, params }) => {
     console.error(error);
   }
 
-  return null;
+  return redirect(redirectTo);
 };
 
 export type LoaderData = {
