@@ -11,7 +11,7 @@ import {
   useLoaderData,
   useMatches,
 } from "remix";
-import type { MetaFunction } from "remix";
+import type { MetaFunction, ShouldReloadFunction } from "remix";
 
 import { ClientOnly } from "~/components/client-only";
 import { Footer } from "~/components/footer";
@@ -193,6 +193,10 @@ export function ErrorBoundary({ error }: { error: Error }) {
     </Document>
   );
 }
+
+export let unstable_shouldReload: ShouldReloadFunction = ({ submission }) => {
+  return submission?.method.toLowerCase() === "post";
+};
 
 export default function Root() {
   let loaderData = useLoaderData<LoaderData>();
