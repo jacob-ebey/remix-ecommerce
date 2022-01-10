@@ -100,6 +100,14 @@ let translations = {
     en: "Add to cart",
     es: "Añadir al carrito",
   },
+  Adding: {
+    en: "Adding...",
+    es: "Agregando...",
+  },
+  "Added!": {
+    en: "Added!",
+    es: "¡Adicional!",
+  },
   "Sold out": {
     en: "Sold out",
     es: "No disponible",

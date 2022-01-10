@@ -1,6 +1,6 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { MouseEventHandler } from "react";
-import { Form, useLocation, useSearchParams } from "remix";
+import { Form, useLocation, useSearchParams, useTransition } from "remix";
 import cn from "classnames";
 
 import type { FullProduct } from "~/models/ecommerce-provider.server";
@@ -12,7 +12,9 @@ export function ProductDetails({
   translations,
 }: {
   product: FullProduct;
-  translations: PickTranslations<"Add to cart" | "Sold out">;
+  translations: PickTranslations<
+    "Add to cart" | "Sold out" | "Added!" | "Adding"
+  >;
 }) {
   let location = useLocation();
   let [searchParams] = useSearchParams();
@@ -83,6 +85,11 @@ export function ProductDetails({
             ) : null}
             <Form replace method="post" className="mt-8">
               <input
+                type="hidden"
+                name="_action"
+                value={translations["Add to cart"]}
+              />
+              <input
                 key={location.pathname + location.search}
                 defaultValue={location.pathname + location.search}
                 type="hidden"
@@ -97,12 +104,15 @@ export function ProductDetails({
               <button
                 data-testid="add-to-cart"
                 className={cn(
-                  "py-4 text-gray-900 block w-full text-center font-semibold uppercase",
+                  "py-4 text-gray-900 active:bg-gray-300 block w-full text-center font-semibold uppercase",
                   disabled ? "bg-gray-300" : "bg-gray-50"
                 )}
                 disabled={disabled}
               >
-                {translations["Add to cart"]}
+                <SubmissionSequenceText
+                  action={translations["Add to cart"]}
+                  strings={[translations["Add to cart"], "Adding...", "Added!"]}
+                />
               </button>
             </Form>
           </div>
@@ -110,6 +120,32 @@ export function ProductDetails({
       </div>
     </main>
   );
+}
+
+function SubmissionSequenceText({
+  strings,
+  action,
+}: {
+  strings: String[];
+  action: string;
+}) {
+  let transition = useTransition();
+  let [text, setText] = useState(strings[0]);
+
+  useEffect(() => {
+    if (transition.submission?.formData.get("_action") === action) {
+      if (transition.state === "submitting") {
+        setText(strings[1]);
+      } else if (transition.state === "loading") {
+        setText(strings[2]);
+      }
+    } else {
+      let id = setTimeout(() => setText(strings[0]), 1000);
+      return () => clearTimeout(id);
+    }
+  }, [transition]);
+
+  return <span>{text}</span>;
 }
 
 function ImageSlider({ images }: { images: string[] }) {
