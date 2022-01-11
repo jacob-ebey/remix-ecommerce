@@ -8,6 +8,11 @@ import { OptimizedImage } from "./optimized-image";
 
 import { CloseIcon, MinusIcon, PlusIcon } from "./icons";
 
+enum Actions {
+  setQuantity = "set-quantity",
+  delete = "delete",
+}
+
 export function CartListItem({
   formattedOptions,
   formattedPrice,
@@ -28,10 +33,23 @@ export function CartListItem({
   >;
 }) {
   let location = useLocation();
-  let { Form } = useFetcher();
+  let fetcher = useFetcher();
+  let optimisticQuantity = quantity;
+  let optimisticDeleting = false;
+
+  if (fetcher.submission) {
+    let values = Object.fromEntries(fetcher.submission.formData);
+    if (typeof values.quantity === "string") {
+      optimisticQuantity = parseInt(values.quantity, 10);
+    }
+
+    if (values._action === Actions.delete) {
+      optimisticDeleting = true;
+    }
+  }
 
   return (
-    <li key={variantId} className="mb-6">
+    <li key={variantId} className="mb-6" hidden={optimisticDeleting}>
       <div className="flex">
         <div className="relative block aspect-square w-16 mr-4">
           <OptimizedImage
@@ -63,8 +81,8 @@ export function CartListItem({
         <p className="text-sm">{formattedPrice}</p>
       </div>
       <div className="flex mt-2">
-        <Form method="post" action="/cart">
-          <input type="hidden" name="_action" defaultValue="delete" />
+        <fetcher.Form method="post" action="/cart">
+          <input type="hidden" name="_action" defaultValue={Actions.delete} />
           <input
             key={location.pathname + location.search}
             type="hidden"
@@ -85,33 +103,29 @@ export function CartListItem({
             <span className="sr-only">{translations["Remove from cart"]}</span>
             <CloseIcon className="w-6 h-6" />
           </button>
-        </Form>
+        </fetcher.Form>
         <div className="p-1 px-3 border border-zinc-700 flex-1 h-9">
           <span className="sr-only">
-            {translations["Quantity: $1"]?.replace("$1", quantity.toString())}
+            {translations["Quantity: $1"]?.replace(
+              "$1",
+              optimisticQuantity.toString()
+            )}
           </span>
-          <span aria-hidden={true}>{quantity}</span>
+          <span aria-hidden={true}>{optimisticQuantity}</span>
         </div>
-        <Form action="/cart" method="post">
-          <input type="hidden" name="_action" defaultValue="set-quantity" />
+        <fetcher.Form action="/cart" method="post">
+          <input type="hidden" name="_action" value={Actions.setQuantity} />
           <input
-            key={location.pathname + location.search}
             type="hidden"
             name="redirect"
-            defaultValue={location.pathname + location.search}
+            value={location.pathname + location.search}
           />
+          <input type="hidden" value={variantId} name="variantId" />
           <input
-            key={variantId}
-            type="hidden"
-            defaultValue={variantId}
-            name="variantId"
-          />
-          <input
-            key={quantity - 1 <= 0 ? 1 : quantity - 1}
             type="hidden"
             name="quantity"
             disabled={quantity - 1 <= 0}
-            defaultValue={quantity - 1 <= 0 ? 1 : quantity - 1}
+            value={Math.max(0, optimisticQuantity - 1)}
           />
           <button
             data-testid="decrement-cart"
@@ -125,27 +139,21 @@ export function CartListItem({
             <span className="sr-only">{translations["Subtract item"]}</span>
             <MinusIcon className="w-6 h-6" />
           </button>
-        </Form>
-        <Form action="/cart" method="post">
-          <input type="hidden" name="_action" defaultValue="set-quantity" />
+        </fetcher.Form>
+        <fetcher.Form action="/cart" method="post">
+          <input
+            type="hidden"
+            name="_action"
+            defaultValue={Actions.setQuantity}
+          />
           <input
             key={location.pathname + location.search}
             type="hidden"
             name="redirect"
-            defaultValue={location.pathname + location.search}
+            value={location.pathname + location.search}
           />
-          <input
-            key={variantId}
-            type="hidden"
-            defaultValue={variantId}
-            name="variantId"
-          />
-          <input
-            key={quantity + 1}
-            type="hidden"
-            name="quantity"
-            defaultValue={quantity + 1}
-          />
+          <input type="hidden" value={variantId} name="variantId" />
+          <input type="hidden" name="quantity" value={optimisticQuantity + 1} />
           <button
             data-testid="increment-cart"
             type="submit"
@@ -154,7 +162,7 @@ export function CartListItem({
             <span className="sr-only">{translations["Add item"]}</span>
             <PlusIcon className="w-6 h-6" />
           </button>
-        </Form>
+        </fetcher.Form>
       </div>
     </li>
   );
