@@ -1,5 +1,5 @@
-import { Fragment, lazy, Suspense } from "react";
-import { Form, Link } from "remix";
+import { Fragment, lazy, Suspense, useState } from "react";
+import { Form, Link, PrefetchPageLinks } from "remix";
 import type { To } from "react-router-dom";
 import { Popover, Transition } from "@headlessui/react";
 
@@ -42,6 +42,8 @@ export function Navbar({
     | "Wishlist"
   >;
 }) {
+  let [prefetchQuery, setPrefetchSeachQuery] = useState("");
+
   return (
     <nav className="p-4 lg:px-6 border-b border-zinc-700">
       <div className="flex">
@@ -100,8 +102,12 @@ export function Navbar({
               name="q"
               className=" p-2 bg-zinc-900 border border-zinc-700 w-full"
               placeholder={translations?.["Search for products..."]}
+              onChange={(e) => setPrefetchSeachQuery(e.target.value)}
             />
           </Form>
+          {prefetchQuery && (
+            <PrefetchPageLinks page={`/${lang}/search?q=${prefetchQuery}`} />
+          )}
         </div>
         <div className="flex items-center">
           <Link
