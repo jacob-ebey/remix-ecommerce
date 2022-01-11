@@ -194,8 +194,8 @@ export function ErrorBoundary({ error }: { error: Error }) {
   );
 }
 
-export let unstable_shouldReload: ShouldReloadFunction = ({ submission }) => {
-  return submission?.method.toLowerCase() === "post";
+export let unstable_shouldReload: ShouldReloadFunction = ({ url }) => {
+  return !url.pathname.startsWith("/search");
 };
 
 export default function Root() {
