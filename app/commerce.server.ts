@@ -9,7 +9,7 @@ if (!process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN) {
   );
 }
 
-let commerceProvider = createShopifyProvider({
+let commerce = createShopifyProvider({
   shop: process.env.SHOPIFY_STORE!,
   storefrontAccessToken: process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN,
   maxAgeSeconds: 60,
@@ -18,4 +18,4 @@ let commerceProvider = createShopifyProvider({
   }),
 });
 
-export default commerceProvider;
+export default commerce;
