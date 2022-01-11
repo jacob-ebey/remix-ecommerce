@@ -7,11 +7,4 @@ module.exports = {
   publicPath: "/build/",
   serverBuildDirectory: "./build",
   ignoredRouteFiles: [".*"],
-  routes(defineRoutes) {
-    return defineRoutes((route) => {
-      if (process.env.NODE_ENV === "development") {
-        route("global.css", "../styles/global.server.ts");
-      }
-    });
-  },
 };

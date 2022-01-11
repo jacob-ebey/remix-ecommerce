@@ -18,6 +18,7 @@ import { Footer } from "~/components/footer";
 import { Navbar, NavbarCategory } from "~/components/navbar";
 
 import logoHref from "~/images/remix-glow.svg";
+import globalStylesheetHref from "~/styles/global.css";
 
 import { GenericCatchBoundary } from "../boundaries/generic-catch-boundary";
 import { GenericErrorBoundary } from "../boundaries/generic-error-boundary";
@@ -50,10 +51,7 @@ export let links: LinksFunction = () => {
   return [
     {
       rel: "stylesheet",
-      href:
-        process.env.NODE_ENV === "development"
-          ? "/global.css"
-          : require("~/styles/global.css"),
+      href: globalStylesheetHref,
     },
   ];
 };
