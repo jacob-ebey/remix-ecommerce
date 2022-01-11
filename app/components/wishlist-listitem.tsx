@@ -84,6 +84,7 @@ export function WishlistListItem({
             name="variantId"
           />
           <button
+            data-testid="remove-from-wishlist"
             type="submit"
             className="w-9 h-9 flex items-center justify-center border border-zinc-700 mr-2"
           >
@@ -127,6 +128,7 @@ export function WishlistListItem({
             defaultValue={quantity - 1 <= 0 ? 1 : quantity - 1}
           />
           <button
+            data-testid="decrement-wishlist"
             type="submit"
             disabled={quantity - 1 <= 0}
             className={cn(
@@ -165,6 +167,7 @@ export function WishlistListItem({
             defaultValue={quantity + 1}
           />
           <button
+            data-testid="increment-wishlist"
             type="submit"
             className="w-9 h-9 flex items-center justify-center border border-zinc-700 border-l-0"
           >
@@ -187,6 +190,7 @@ export function WishlistListItem({
             name="variantId"
           />
           <button
+            data-testid="move-to-cart"
             type="submit"
             className="w-9 h-9 flex items-center justify-center border border-zinc-700 ml-2"
             title={translations["Move to cart"]}

@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import type { ChangeEventHandler } from "react";
 import { Form, Link, useLoaderData, useLocation, useSubmit } from "remix";
 import { useId } from "@reach/auto-id";
 import cn from "classnames";
@@ -14,7 +14,12 @@ function ThreeProductGridItem({ product }: { product: CDPProduct }) {
   return (
     <li key={product.id}>
       <div className="group block relative aspect-square overflow-hidden bg-zinc-800">
-        <Link className="block group" prefetch="intent" to={product.to} aria-labelledby={id}>
+        <Link
+          className="block group"
+          prefetch="intent"
+          to={product.to}
+          aria-labelledby={id}
+        >
           <OptimizedImage
             className="object-cover w-full h-full transform transition duration-500 motion-safe:group-focus:scale-110 motion-safe:group-hover:scale-110"
             src={product.image}
@@ -40,7 +45,8 @@ function ThreeProductGridItem({ product }: { product: CDPProduct }) {
         <div className="absolute top-0 left-0 right-0">
           <div className="flex">
             <Link
-              prefetch="intent" to={product.to}
+              prefetch="intent"
+              to={product.to}
               className="group-tpgi block flex-1"
               tabIndex={-1}
               id={id}
@@ -82,12 +88,11 @@ function ThreeProductGridItem({ product }: { product: CDPProduct }) {
 export default function CDP() {
   let { category, sort, categories, search, sortByOptions, products } =
     useLoaderData<LoaderData>();
-  let formRef = useRef<HTMLFormElement>(null);
   let submit = useSubmit();
   let location = useLocation();
 
-  let submitForm = () => {
-    submit(formRef.current);
+  let submitForm: ChangeEventHandler<HTMLSelectElement> = (event) => {
+    submit((event.currentTarget || event.target).closest("form"));
   };
 
   return (
@@ -103,9 +108,11 @@ export default function CDP() {
               }`}
             >
               <Link
+                data-testid="category-link"
                 aria-selected={cat.slug !== category}
                 className="focus:underline hover:underline whitespace-nowrap"
-                prefetch="intent" to={(() => {
+                prefetch="intent"
+                to={(() => {
                   let params = new URLSearchParams(location.search);
                   params.delete("q");
                   params.set("category", cat.slug);
@@ -129,9 +136,11 @@ export default function CDP() {
               }`}
             >
               <Link
+                data-testid="sort-by-link"
                 aria-selected={sortBy.value !== sort}
                 className="focus:underline hover:underline whitespace-nowrap"
-                prefetch="intent" to={(() => {
+                prefetch="intent"
+                to={(() => {
                   let params = new URLSearchParams(location.search);
                   params.set("sort", sortBy.value);
                   return location.pathname + "?" + params.toString();
@@ -143,10 +152,21 @@ export default function CDP() {
           ))}
         </ul>
       </nav>
-      <Form ref={formRef} className="p-4 border-b border-zinc-700 lg:hidden">
+      <Form
+        className="px-4 pt-4 lg:hidden"
+        action={(() => {
+          let params = new URLSearchParams(location.search);
+          params.delete("category");
+          params.delete("q");
+          let search = params.toString();
+          search = search ? "?" + search : "";
+          return location.pathname + search;
+        })()}
+      >
         <label>
           <span className="sr-only">Categories</span>
           <select
+            data-testid="category-select"
             key={category}
             defaultValue={category}
             className="bg-zinc-900 border border-zinc-700 w-full block p-2"
@@ -160,9 +180,26 @@ export default function CDP() {
             ))}
           </select>
         </label>
+        <noscript>
+          <button className="block mt-4 px-4 py-2 border border-zinc-700">
+            Update
+          </button>
+        </noscript>
+      </Form>
+      <Form
+        className="px-4 pb-2 border-b border-zinc-700 lg:hidden"
+        action={(() => {
+          let params = new URLSearchParams(location.search);
+          params.delete("sort");
+          let search = params.toString();
+          search = search ? "?" + search : "";
+          return location.pathname + search;
+        })()}
+      >
         <label>
           <span className="sr-only">Sort By</span>
           <select
+            data-testid="sort-by-select"
             key={sort}
             defaultValue={sort}
             className="bg-zinc-900 border border-zinc-700 w-full block p-2 mt-4"
@@ -184,7 +221,7 @@ export default function CDP() {
       </Form>
 
       <article className="sm:px-4 lg:px-0 lg:pr-6 mb-8 col-start-3 col-span-10">
-        <p className="pl-4 mt-4 mb-8">
+        <p data-testid="search-results-label" className="pl-4 mt-4 mb-8">
           Showing {products.length} results
           {search ? ` for "${search}"` : ""}
         </p>

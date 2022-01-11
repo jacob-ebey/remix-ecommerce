@@ -51,10 +51,13 @@ export function ProductDetails({
                 {product.options.map((option) => (
                   <div key={option.name} className="mt-6">
                     <h2 className="font-semibold">{option.name}</h2>
-                    <ul className="mt-2">
+                    <ul className="mt-2" data-testid="product-option">
                       {option.values.map((value) => (
                         <li key={value} className="inline-block mr-2">
                           <button
+                            aria-selected={
+                              searchParams.get(option.name) === value
+                            }
                             className={cn(
                               "px-4 py-2 border rounded hover:text-gray-300",
                               searchParams.get(option.name) === value
@@ -92,6 +95,7 @@ export function ProductDetails({
                 name="variantId"
               />
               <button
+                data-testid="add-to-cart"
                 className={cn(
                   "py-4 text-gray-900 block w-full text-center font-semibold uppercase",
                   disabled ? "bg-gray-300" : "bg-gray-50"

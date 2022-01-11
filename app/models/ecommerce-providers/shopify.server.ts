@@ -301,21 +301,22 @@ export function createShopifyProvider({
       );
 
       let edges = category
-        ? json.data.collections.edges[0].node.products.edges
+        ? json.data.collections.edges[0]?.node.products.edges
         : json.data.products.edges;
 
-      let products = edges.map(
-        ({
-          node: { id, handle, title, images, priceRange, variants },
-        }: any): Product => ({
-          formattedPrice: formatPrice(priceRange.minVariantPrice),
-          id,
-          defaultVariantId: variants.edges[0].node.id,
-          image: images.edges[0].node.originalSrc,
-          slug: handle,
-          title,
-        })
-      );
+      let products =
+        edges?.map(
+          ({
+            node: { id, handle, title, images, priceRange, variants },
+          }: any): Product => ({
+            formattedPrice: formatPrice(priceRange.minVariantPrice),
+            id,
+            defaultVariantId: variants.edges[0].node.id,
+            image: images.edges[0].node.originalSrc,
+            slug: handle,
+            title,
+          })
+        ) || [];
 
       return products;
     },

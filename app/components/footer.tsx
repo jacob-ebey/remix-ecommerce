@@ -51,7 +51,8 @@ export function Footer({
             <li key={page.id}>
               <Link
                 className="focus:text-gray-300 hover:text-gray-300"
-                prefetch="intent" to={page.to}
+                prefetch="intent"
+                to={page.to}
               >
                 {page.title}
               </Link>
@@ -84,7 +85,10 @@ export function Footer({
                     value={location.pathname + location.search}
                   />
 
-                  <Popover.Button className="inline-flex items-center p-2 border border-zinc-700 rounded">
+                  <Popover.Button
+                    data-testid="language-selector"
+                    className="inline-flex items-center p-2 border border-zinc-700 rounded"
+                  >
                     <span className="sr-only">Change language</span>
                     {(() => {
                       switch (lang) {

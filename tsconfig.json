@@ -1,8 +1,8 @@
 {
-  "include": ["remix.env.d.ts", "app/**/*.ts", "app/**/*.tsx"],
+  "include": ["remix.env.d.ts", "app/**/*.ts", "app/**/*.tsx", "cypress/**/*.ts"],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2019"],
-    "isolatedModules": true,
+    "types": ["cypress"],
     "esModuleInterop": true,
     "jsx": "react-jsx",
     "module": "ESNext",

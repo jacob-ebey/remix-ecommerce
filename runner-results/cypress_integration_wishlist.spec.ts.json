@@ -1,0 +1,10 @@
+{
+  "suites": 1,
+  "tests": 5,
+  "passes": 5,
+  "pending": 0,
+  "failures": 0,
+  "start": "2022-01-11T08:06:22.536Z",
+  "duration": 18693,
+  "file": "cypress/integration/wishlist.spec.ts"
+}

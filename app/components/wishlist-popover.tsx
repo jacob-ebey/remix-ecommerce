@@ -61,6 +61,7 @@ export function WishlistPopover({
             <div className="fixed top-0 right-0 bottom-0 w-full max-w-md overflow-hidden text-left align-middle transition-all transform bg-zinc-900 shadow-xl flex flex-col">
               <div className="flex justify-between p-4 lg:px-6">
                 <button
+                  data-testid="close-wishlist"
                   className="relative flex items-center hover:text-gray-300"
                   onClick={onClose}
                 >

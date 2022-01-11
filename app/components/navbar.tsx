@@ -91,10 +91,12 @@ export function Navbar({
             ))}
           </ul>
           <Form
+            data-testid="search-form"
             action={`/${lang}/search`}
             className="flex-1 max-w-lg mx-auto hidden lg:block"
           >
             <input
+              data-testid="search-input"
               name="q"
               className=" p-2 bg-zinc-900 border border-zinc-700 w-full"
               placeholder={translations?.["Search for products..."]}
@@ -103,6 +105,7 @@ export function Navbar({
         </div>
         <div className="flex items-center">
           <Link
+            data-testid="cart-link"
             prefetch="intent"
             to={`/${lang}/cart`}
             className="group relative inline-block hover:text-gray-300 ml-4"
@@ -117,6 +120,7 @@ export function Navbar({
             <CartIcon className="w-8 h-8" />
             {!!cartCount && (
               <span
+                data-testid="cart-count"
                 style={{ lineHeight: "0.75rem" }}
                 className="absolute bottom-0 left-0 translate translate-y-[25%] translate-x-[-25%] inline-flex items-center justify-center px-[0.25rem] py-[0.125rem] text-xs text-zinc-900 bg-gray-50 group-hover:bg-gray-300 rounded-full"
               >
@@ -125,6 +129,7 @@ export function Navbar({
             )}
           </Link>
           <Link
+            data-testid="wishlist-link"
             prefetch="intent"
             to={`/${lang}/wishlist`}
             className="group relative hover:text-gray-300 ml-4"
@@ -139,6 +144,7 @@ export function Navbar({
             <WishlistIcon className="w-8 h-8" />
             {!!wishlistCount && (
               <span
+                data-testid="wishlist-count"
                 style={{ lineHeight: "0.75rem" }}
                 className="absolute bottom-0 left-0 translate translate-y-[25%] translate-x-[-25%] inline-flex items-center justify-center px-[0.25rem] py-[0.125rem] text-xs text-zinc-900 bg-gray-50 group-hover:bg-gray-300 rounded-full"
               >
@@ -210,12 +216,18 @@ export function Navbar({
           </Popover>
         </div>
       </div>
-      <div className="lg:hidden mt-3">
+      <Form
+        data-testid="mobile-search-form"
+        action={`/${lang}/search`}
+        className="lg:hidden mt-3"
+      >
         <input
+          data-testid="mobile-search-input"
+          name="q"
           className="bg-zinc-900 border border-zinc-700 w-full p-2"
           placeholder={translations?.["Search for products..."]}
         />
-      </div>
+      </Form>
     </nav>
   );
 }

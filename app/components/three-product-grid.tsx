@@ -138,6 +138,7 @@ function ThreeProductGridItem({
               />
 
               <button
+                data-testid="add-to-wishlist"
                 className={cn(
                   "p-2 bg-zinc-900 focus:bg-zinc-900 hover:bg-zinc-900 transition-colors ease-in-out duration-300",
                   product.favorited ? "text-red-brand" : wishlistColors

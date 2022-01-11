@@ -78,6 +78,7 @@ export function CartListItem({
             name="variantId"
           />
           <button
+            data-testid="remove-from-cart"
             type="submit"
             className="w-9 h-9 flex items-center justify-center border border-zinc-700 mr-2"
           >
@@ -113,6 +114,7 @@ export function CartListItem({
             defaultValue={quantity - 1 <= 0 ? 1 : quantity - 1}
           />
           <button
+            data-testid="decrement-cart"
             type="submit"
             disabled={quantity - 1 <= 0}
             className={cn(
@@ -145,6 +147,7 @@ export function CartListItem({
             defaultValue={quantity + 1}
           />
           <button
+            data-testid="increment-cart"
             type="submit"
             className="w-9 h-9 flex items-center justify-center border border-zinc-700 border-l-0"
           >
