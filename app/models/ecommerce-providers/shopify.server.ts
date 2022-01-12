@@ -26,7 +26,7 @@ export function createShopifyProvider({
   storefrontAccessToken,
 }: ShopifyProviderOptions): EcommerceProvider {
   let href = `https://${shop}.myshopify.com/api/2021-10/graphql.json`;
-  function query(locale: string, query: string, variables?: any) {
+  async function query(locale: string, query: string, variables?: any) {
     let request = new Request(href, {
       method: "POST",
       headers: {
@@ -62,7 +62,7 @@ export function createShopifyProvider({
       let itemsMap = new Map(items.map((item) => [item.variantId, item]));
       let fullItems: FullCartItem[] = [];
       for (let item of json.data.nodes) {
-        let itemInput = itemsMap.get(item.id);
+        let itemInput = !!item && itemsMap.get(item.id);
         if (!itemInput) {
           continue;
         }
@@ -94,7 +94,9 @@ export function createShopifyProvider({
 
       let formattedSubTotal = formatPrice({
         amount: subtotal.toDecimalPlaces(2).toString(),
-        currencyCode: json.data.nodes[0].priceV2.currencyCode,
+        currencyCode: json.data.nodes.find(
+          (n: any) => !!n?.priceV2?.currencyCode
+        ).priceV2.currencyCode,
       });
 
       let translations = getTranslations(locale, ["Calculated at checkout"]);
@@ -254,7 +256,7 @@ export function createShopifyProvider({
         })),
       };
     },
-    async getProducts(locale, category, sort, search) {
+    async getProducts(locale, category, sort, search, cursor, perPage = 30) {
       let q = "";
       if (search) {
         q += `product_type:${search} OR title:${search} OR tag:${search} `;
@@ -294,31 +296,39 @@ export function createShopifyProvider({
         category ? getCollectionProductsQuery : getAllProductsQuery,
         {
           ...sortVariables,
-          first: 250,
+          first: perPage,
           query: q,
           collection: category,
+          cursor,
         }
       );
 
-      let edges = category
-        ? json.data.collections.edges[0]?.node.products.edges
-        : json.data.products.edges;
+      let productsInfo = category
+        ? json.data.collections.edges[0]?.node.products
+        : json.data.products;
 
+      let { edges, pageInfo } = productsInfo;
+
+      let nextPageCursor: string | undefined = undefined;
       let products =
         edges?.map(
           ({
+            cursor,
             node: { id, handle, title, images, priceRange, variants },
-          }: any): Product => ({
-            formattedPrice: formatPrice(priceRange.minVariantPrice),
-            id,
-            defaultVariantId: variants.edges[0].node.id,
-            image: images.edges[0].node.originalSrc,
-            slug: handle,
-            title,
-          })
+          }: any): Product => {
+            nextPageCursor = cursor;
+            return {
+              formattedPrice: formatPrice(priceRange.minVariantPrice),
+              id,
+              defaultVariantId: variants.edges[0].node.id,
+              image: images.edges[0].node.originalSrc,
+              slug: handle,
+              title,
+            };
+          }
         ) || [];
 
-      return products;
+      return { hasNextPage: pageInfo.hasNextPage, nextPageCursor, products };
     },
     async getSortByOptions(locale) {
       let translations = getTranslations(locale, [
@@ -358,7 +368,7 @@ export function createShopifyProvider({
       let itemsMap = new Map(items.map((item) => [item.variantId, item]));
       let fullItems: FullWishlistItem[] = [];
       for (let item of json.data.nodes) {
-        let itemInput = itemsMap.get(item.id);
+        let itemInput = !!item && itemsMap.get(item.id);
         if (!itemInput) {
           continue;
         }
@@ -490,6 +500,7 @@ let productConnectionFragment = /* GraphQL */ `
       hasPreviousPage
     }
     edges {
+      cursor
       node {
         id
         title
@@ -529,16 +540,18 @@ let productConnectionFragment = /* GraphQL */ `
 
 let getAllProductsQuery = /* GraphQL */ `
   query getAllProducts(
-    $first: Int = 250
+    $first: Int = 20
     $query: String = ""
     $sortKey: ProductSortKeys = RELEVANCE
     $reverse: Boolean = false
+    $cursor: String
   ) {
     products(
       first: $first
       sortKey: $sortKey
       reverse: $reverse
       query: $query
+      after: $cursor
     ) {
       ...productConnection
     }
@@ -549,15 +562,21 @@ let getAllProductsQuery = /* GraphQL */ `
 let getCollectionProductsQuery = /* GraphQL */ `
   query getProductsFromCollection(
     $collection: String
-    $first: Int = 250
+    $first: Int = 20
     $sortKey: ProductCollectionSortKeys = RELEVANCE
     $reverse: Boolean = false
+    $cursor: String
   ) {
     collections(first: 1, query: $collection) {
       edges {
         node {
           handle
-          products(first: $first, sortKey: $sortKey, reverse: $reverse) {
+          products(
+            first: $first
+            sortKey: $sortKey
+            reverse: $reverse
+            after: $cursor
+          ) {
             ...productConnection
           }
         }
@@ -618,7 +637,7 @@ let getProductQuery = /* GraphQL */ `
           }
         }
       }
-      images(first: 250) {
+      images(first: 20) {
         pageInfo {
           hasNextPage
           hasPreviousPage

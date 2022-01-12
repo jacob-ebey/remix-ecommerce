@@ -77,6 +77,12 @@ export interface SelectedProductOption {
   value: string;
 }
 
+export interface ProductsResult {
+  hasNextPage: boolean;
+  nextPageCursor?: string;
+  products: Product[];
+}
+
 export interface EcommerceProvider {
   getCartInfo(
     locale: Language,
@@ -96,8 +102,10 @@ export interface EcommerceProvider {
     language: Language,
     category?: string,
     sort?: string,
-    search?: string
-  ): Promise<Product[]>;
+    search?: string,
+    cursor?: string,
+    perPage?: number
+  ): Promise<ProductsResult>;
   getSortByOptions(language: Language): Promise<SortByOption[]>;
   getWishlistInfo(
     locale: Language,

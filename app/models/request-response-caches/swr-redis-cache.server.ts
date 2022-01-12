@@ -64,6 +64,11 @@ export let createSwrRedisCache = ({
         let cachedResponseJson = JSON.parse(
           cachedResponseString
         ) as CachedResponse;
+
+        if (cachedResponseJson.status !== 200) {
+          return null;
+        }
+
         let cachedResponse = new Response(cachedResponseJson.body, {
           status: cachedResponseJson.status,
           statusText: cachedResponseJson.statusText,
@@ -77,15 +82,17 @@ export let createSwrRedisCache = ({
 
           (async () => {
             let responseToCache = await fetch(request.clone());
-            let toCache: CachedResponse = {
-              status: responseToCache.status,
-              statusText: responseToCache.statusText,
-              headers: Array.from(responseToCache.headers),
-              body: await responseToCache.text(),
-            };
+            if (responseToCache.status === 200) {
+              let toCache: CachedResponse = {
+                status: responseToCache.status,
+                statusText: responseToCache.statusText,
+                headers: Array.from(responseToCache.headers),
+                body: await responseToCache.text(),
+              };
 
-            await redisClient.set(responseKey, JSON.stringify(toCache));
-            await redisClient.setEx(stillGoodKey, maxAgeSeconds, "true");
+              await redisClient.set(responseKey, JSON.stringify(toCache));
+              await redisClient.setEx(stillGoodKey, maxAgeSeconds, "true");
+            }
           })().catch((error) => {
             console.error("Failed to revalidate", error);
           });
@@ -100,19 +107,21 @@ export let createSwrRedisCache = ({
       let responseToCache = response.clone();
       response.headers.set("X-SWR-Cache", "miss");
 
-      (async () => {
-        let toCache: CachedResponse = {
-          status: responseToCache.status,
-          statusText: responseToCache.statusText,
-          headers: Array.from(responseToCache.headers),
-          body: await responseToCache.text(),
-        };
+      if (responseToCache.status === 200) {
+        (async () => {
+          let toCache: CachedResponse = {
+            status: responseToCache.status,
+            statusText: responseToCache.statusText,
+            headers: Array.from(responseToCache.headers),
+            body: await responseToCache.text(),
+          };
 
-        await redisClient.set(responseKey, JSON.stringify(toCache));
-        await redisClient.setEx(stillGoodKey, maxAgeSeconds, "true");
-      })().catch((error) => {
-        console.error("Failed to seed cache", error);
-      });
+          await redisClient.set(responseKey, JSON.stringify(toCache));
+          await redisClient.setEx(stillGoodKey, maxAgeSeconds, "true");
+        })().catch((error) => {
+          console.error("Failed to seed cache", error);
+        });
+      }
     }
 
     return response;

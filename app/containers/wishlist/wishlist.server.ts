@@ -44,7 +44,6 @@ export let action: ActionFunction = async ({ request, params }) => {
         let productId = formData.get("productId");
         let variantId = formData.get("variantId");
         let quantityStr = formData.get("quantity");
-        console.log({ productId, variantId, quantityStr });
         if (!productId || !variantId || !quantityStr) {
           break;
         }

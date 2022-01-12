@@ -86,8 +86,16 @@ function ThreeProductGridItem({ product }: { product: CDPProduct }) {
 }
 
 export default function CDP() {
-  let { category, sort, categories, search, sortByOptions, products } =
-    useLoaderData<LoaderData>();
+  let {
+    category,
+    sort,
+    categories,
+    search,
+    sortByOptions,
+    products,
+    hasNextPage,
+    nextPageCursor,
+  } = useLoaderData<LoaderData>();
   let submit = useSubmit();
   let location = useLocation();
 
@@ -114,6 +122,7 @@ export default function CDP() {
                 prefetch="intent"
                 to={(() => {
                   let params = new URLSearchParams(location.search);
+                  params.delete("cursor");
                   params.delete("q");
                   params.set("category", cat.slug);
                   params.sort();
@@ -142,6 +151,7 @@ export default function CDP() {
                 prefetch="intent"
                 to={(() => {
                   let params = new URLSearchParams(location.search);
+                  params.delete("cursor");
                   params.set("sort", sortBy.value);
                   return location.pathname + "?" + params.toString();
                 })()}
@@ -157,6 +167,7 @@ export default function CDP() {
         action={(() => {
           let params = new URLSearchParams(location.search);
           params.delete("category");
+          params.delete("cursor");
           params.delete("q");
           let search = params.toString();
           search = search ? "?" + search : "";
@@ -190,6 +201,7 @@ export default function CDP() {
         className="px-4 pb-2 border-b border-zinc-700 lg:hidden"
         action={(() => {
           let params = new URLSearchParams(location.search);
+          params.delete("cursor");
           params.delete("sort");
           let search = params.toString();
           search = search ? "?" + search : "";
@@ -230,6 +242,20 @@ export default function CDP() {
             <ThreeProductGridItem key={product.id} product={product} />
           ))}
         </ul>
+        {hasNextPage && nextPageCursor && (
+          <p className="mt-8">
+            <Link
+              className="text-lg font-semibold focus:underline hover:underline"
+              to={(() => {
+                let params = new URLSearchParams(location.search);
+                params.set("cursor", nextPageCursor);
+                return location.pathname + "?" + params.toString();
+              })()}
+            >
+              Load more
+            </Link>
+          </p>
+        )}
       </article>
     </main>
   );

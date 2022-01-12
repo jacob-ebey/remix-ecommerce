@@ -25,6 +25,8 @@ export type LoaderData = {
   search?: string;
   sortByOptions: SortByOption[];
   products: CDPProduct[];
+  hasNextPage: boolean;
+  nextPageCursor?: string;
 };
 
 export let loader: LoaderFunction = async ({ request, params }) => {
@@ -35,11 +37,12 @@ export let loader: LoaderFunction = async ({ request, params }) => {
   let category = url.searchParams.get("category") || undefined;
   let sort = url.searchParams.get("sort") || undefined;
   let search = url.searchParams.get("q") || undefined;
+  let cursor = url.searchParams.get("cursor") || undefined;
 
-  let [categories, sortByOptions, products, wishlist] = await Promise.all([
+  let [categories, sortByOptions, productsPage, wishlist] = await Promise.all([
     commerce.getCategories(lang, 250),
     commerce.getSortByOptions(lang),
-    commerce.getProducts(lang, category, sort, search),
+    commerce.getProducts(lang, category, sort, search, cursor),
     session.getWishlist(),
   ]);
 
@@ -53,7 +56,9 @@ export let loader: LoaderFunction = async ({ request, params }) => {
     categories,
     search,
     sortByOptions,
-    products: products.map((product) => ({
+    hasNextPage: productsPage.hasNextPage,
+    nextPageCursor: productsPage.nextPageCursor,
+    products: productsPage.products.map((product) => ({
       favorited: wishlistHasProduct.has(product.id),
       formattedPrice: product.formattedPrice,
       id: product.id,
