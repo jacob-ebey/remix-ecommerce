@@ -4,8 +4,8 @@ import Component, {
   links,
   meta,
   unstable_shouldReload,
-} from "~/containers/layout/layout.component";
-import { loader } from "~/containers/layout/layout.server";
+} from "~/route-containers/layout/layout.component";
+import { loader } from "~/route-containers/layout/layout.server";
 
 export default Component;
 export {

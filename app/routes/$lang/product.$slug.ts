@@ -1,10 +1,10 @@
 import Component, {
   meta,
   unstable_shouldReload,
-} from "~/containers/pdp/pdp.component";
-import { action, headers, loader } from "~/containers/pdp/pdp.server";
-import { GenericCatchBoundary } from "~/containers/boundaries/generic-catch-boundary";
-import { GenericErrorBoundary } from "~/containers/boundaries/generic-error-boundary";
+} from "~/route-containers/pdp/pdp.component";
+import { action, headers, loader } from "~/route-containers/pdp/pdp.server";
+import { GenericCatchBoundary } from "~/route-containers/boundaries/generic-catch-boundary";
+import { GenericErrorBoundary } from "~/route-containers/boundaries/generic-error-boundary";
 
 export default Component;
 export { action, headers, loader, meta, unstable_shouldReload };

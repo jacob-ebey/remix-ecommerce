@@ -1,7 +1,7 @@
-import Component from "~/containers/wishlist/wishlist.component";
-import { action, headers, loader } from "~/containers/wishlist/wishlist.server";
-import { GenericCatchBoundary } from "~/containers/boundaries/generic-catch-boundary";
-import { GenericErrorBoundary } from "~/containers/boundaries/generic-error-boundary";
+import Component from "~/route-containers/wishlist/wishlist.component";
+import { action, headers, loader } from "~/route-containers/wishlist/wishlist.server";
+import { GenericCatchBoundary } from "~/route-containers/boundaries/generic-catch-boundary";
+import { GenericErrorBoundary } from "~/route-containers/boundaries/generic-error-boundary";
 
 export default Component;
 export { action, headers, loader };

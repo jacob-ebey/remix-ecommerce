@@ -1,9 +1,9 @@
 import Component, {
   meta,
-} from "~/containers/generic-page/generic-page.component";
-import { loader } from "~/containers/generic-page/generic-page.server";
-import { GenericCatchBoundary } from "~/containers/boundaries/generic-catch-boundary";
-import { GenericErrorBoundary } from "~/containers/boundaries/generic-error-boundary";
+} from "~/route-containers/generic-page/generic-page.component";
+import { loader } from "~/route-containers/generic-page/generic-page.server";
+import { GenericCatchBoundary } from "~/route-containers/boundaries/generic-catch-boundary";
+import { GenericErrorBoundary } from "~/route-containers/boundaries/generic-error-boundary";
 
 export default Component;
 export { loader, meta };
