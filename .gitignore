@@ -9,3 +9,4 @@ node_modules
 
 /cypress/videos
 /cypress/screenshots
+/runner-results
