@@ -88,7 +88,11 @@ export interface EcommerceProvider {
     locale: Language,
     items: CartItem[]
   ): Promise<CartInfo | undefined>;
-  getCategories(language: Language, count: number): Promise<Category[]>;
+  getCategories(
+    language: Language,
+    count: number,
+    nocache?: boolean
+  ): Promise<Category[]>;
   getCheckoutUrl(language: Language, items: CartItem[]): Promise<string>;
   getFeaturedProducts(language: Language): Promise<Product[]>;
   getPage(language: Language, slug: string): Promise<FullPage | undefined>;
@@ -104,7 +108,8 @@ export interface EcommerceProvider {
     sort?: string,
     search?: string,
     cursor?: string,
-    perPage?: number
+    perPage?: number,
+    nocache?: boolean
   ): Promise<ProductsResult>;
   getSortByOptions(language: Language): Promise<SortByOption[]>;
   getWishlistInfo(

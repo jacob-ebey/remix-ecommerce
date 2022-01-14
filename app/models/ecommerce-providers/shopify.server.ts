@@ -26,7 +26,12 @@ export function createShopifyProvider({
   storefrontAccessToken,
 }: ShopifyProviderOptions): EcommerceProvider {
   let href = `https://${shop}.myshopify.com/api/2021-10/graphql.json`;
-  async function query(locale: string, query: string, variables?: any) {
+  async function query(
+    locale: string,
+    query: string,
+    variables?: any,
+    nocache?: boolean
+  ) {
     let request = new Request(href, {
       method: "POST",
       headers: {
@@ -42,7 +47,7 @@ export function createShopifyProvider({
         ? maxAgeSeconds(request.clone())
         : maxAgeSeconds;
 
-    if (cache && typeof maxAge === "number") {
+    if (!nocache && cache && typeof maxAge === "number") {
       return cache(request, maxAge).then((res) => res.json());
     }
 
@@ -109,10 +114,15 @@ export function createShopifyProvider({
         items: fullItems,
       };
     },
-    async getCategories(locale, count) {
-      let json = await query(locale, getAllCollectionQuery, {
-        first: count,
-      });
+    async getCategories(locale, count, nocache) {
+      let json = await query(
+        locale,
+        getAllCollectionQuery,
+        {
+          first: count,
+        },
+        nocache
+      );
 
       let categories = json.data.collections.edges.map(
         ({ node: { title, handle } }: any): Category => ({
@@ -256,7 +266,15 @@ export function createShopifyProvider({
         })),
       };
     },
-    async getProducts(locale, category, sort, search, cursor, perPage = 30) {
+    async getProducts(
+      locale,
+      category,
+      sort,
+      search,
+      cursor,
+      perPage = 30,
+      nocache
+    ) {
       let q = "";
       if (search) {
         q += `product_type:${search} OR title:${search} OR tag:${search} `;
@@ -300,7 +318,8 @@ export function createShopifyProvider({
           query: q,
           collection: category,
           cursor,
-        }
+        },
+        nocache
       );
 
       let productsInfo = category

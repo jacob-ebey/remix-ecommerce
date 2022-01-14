@@ -38,11 +38,12 @@ export let loader: LoaderFunction = async ({ request, params }) => {
   let sort = url.searchParams.get("sort") || undefined;
   let search = url.searchParams.get("q") || undefined;
   let cursor = url.searchParams.get("cursor") || undefined;
+  let nocache = url.searchParams.has("nocache");
 
   let [categories, sortByOptions, productsPage, wishlist] = await Promise.all([
-    commerce.getCategories(lang, 250),
+    commerce.getCategories(lang, 250, nocache),
     commerce.getSortByOptions(lang),
-    commerce.getProducts(lang, category, sort, search, cursor),
+    commerce.getProducts(lang, category, sort, search, cursor, 30, nocache),
     session.getWishlist(),
   ]);
 
