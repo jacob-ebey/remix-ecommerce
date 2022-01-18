@@ -1,89 +1,9 @@
 import type { ChangeEventHandler } from "react";
 import { Form, Link, useLoaderData, useLocation, useSubmit } from "remix";
-import { useId } from "@reach/auto-id";
-import cn from "classnames";
 
-import { WishlistIcon } from "~/components/icons";
-import { OptimizedImage } from "~/components/optimized-image";
+import { CdpProductGridItem } from "~/components/cdp-product-grid-item";
 
-import type { CDPProduct, LoaderData } from "./cdp.server";
-
-function ThreeProductGridItem({ product }: { product: CDPProduct }) {
-  let id = `three-product-grid-item-${useId()}`;
-
-  return (
-    <li key={product.id}>
-      <div className="group block relative aspect-square overflow-hidden bg-zinc-800">
-        <Link
-          className="block group"
-          prefetch="intent"
-          to={product.to}
-          aria-labelledby={id}
-        >
-          <OptimizedImage
-            className="object-cover w-full h-full transform transition duration-500 motion-safe:group-focus:scale-110 motion-safe:group-hover:scale-110"
-            src={product.image}
-            width={480}
-            height={480}
-            responsive={[
-              {
-                size: {
-                  height: 480,
-                  width: 480,
-                },
-              },
-              {
-                size: {
-                  height: 600,
-                  width: 600,
-                },
-              },
-            ]}
-            alt=""
-          />
-        </Link>
-        <div className="absolute top-0 left-0 right-0">
-          <div className="flex">
-            <Link
-              prefetch="intent"
-              to={product.to}
-              className="group-tpgi block flex-1"
-              tabIndex={-1}
-              id={id}
-            >
-              <h1 className="inline-block py-2 px-4 bg-zinc-900 text-2xl font-semibold">
-                {product.title}
-              </h1>
-              <br />
-              <p className="inline-block text-sm py-2 px-4 bg-zinc-900">
-                {product.formattedPrice}
-              </p>
-            </Link>
-            <div>
-              <button
-                className={cn(
-                  "p-2 bg-zinc-900 focus:bg-zinc-900 hover:bg-zinc-900 transition-colors ease-in-out duration-300",
-                  "group-focus:bg-pink-brand",
-                  "group-hover:bg-pink-brand",
-                  "focus:bg-pink-brand",
-                  "hover:bg-pink-brand",
-                  "focus:text-zinc-900",
-                  "hover:text-zinc-900"
-                )}
-                onClick={() => alert("wishlist")}
-              >
-                <span className="sr-only">
-                  Add "{product.title}" to wishlist
-                </span>
-                <WishlistIcon className="w-8 h-8" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </li>
-  );
-}
+import type { LoaderData } from "./cdp.server";
 
 export default function CDP() {
   let {
@@ -95,6 +15,7 @@ export default function CDP() {
     products,
     hasNextPage,
     nextPageCursor,
+    translations,
   } = useLoaderData<LoaderData>();
   let submit = useSubmit();
   let location = useLocation();
@@ -239,7 +160,11 @@ export default function CDP() {
         </p>
         <ul className="grid gap-4 grid-flow-row sm:grid-cols-2 md:grid-cols-3">
           {products.map((product, index) => (
-            <ThreeProductGridItem key={product.id} product={product} />
+            <CdpProductGridItem
+              key={product.id}
+              product={product}
+              translations={translations}
+            />
           ))}
         </ul>
         {hasNextPage && nextPageCursor && (

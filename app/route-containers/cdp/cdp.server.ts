@@ -8,6 +8,8 @@ import type {
 } from "~/models/ecommerce-provider.server";
 import commerce from "~/commerce.server";
 import { getSession } from "~/session.server";
+import { getTranslations } from "~/translations.server";
+import type { PickTranslations } from "~/translations.server";
 
 export type CDPProduct = {
   id: string;
@@ -16,6 +18,7 @@ export type CDPProduct = {
   favorited: boolean;
   image: string;
   to: To;
+  defaultVariantId: string;
 };
 
 export type LoaderData = {
@@ -27,6 +30,7 @@ export type LoaderData = {
   products: CDPProduct[];
   hasNextPage: boolean;
   nextPageCursor?: string;
+  translations: PickTranslations<"Add to wishlist" | "Remove from wishlist">;
 };
 
 export let loader: LoaderFunction = async ({ request, params }) => {
@@ -51,6 +55,11 @@ export let loader: LoaderFunction = async ({ request, params }) => {
     wishlist.map<string>((item) => item.productId)
   );
 
+  let translations = getTranslations(lang, [
+    "Add to wishlist",
+    "Remove from wishlist",
+  ]);
+
   return json<LoaderData>({
     category,
     sort,
@@ -66,6 +75,8 @@ export let loader: LoaderFunction = async ({ request, params }) => {
       image: product.image,
       title: product.title,
       to: `/${lang}/product/${product.slug}`,
+      defaultVariantId: product.defaultVariantId,
     })),
+    translations,
   });
 };

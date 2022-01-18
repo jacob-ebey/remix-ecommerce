@@ -154,7 +154,7 @@ export function Footer({
       </div>
       <div className="border-t border-zinc-700 px-4 lg:px-6 py-8">
         <p className="text-sm text-gray-300">
-          © 2020 {storeName}. All rights reserved.
+          © 2022 {storeName}. All rights reserved.
         </p>
       </div>
     </footer>
