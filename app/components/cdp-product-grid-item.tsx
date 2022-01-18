@@ -1,4 +1,4 @@
-import { Form, Link } from "remix";
+import { Form, Link, useLocation } from "remix";
 import { useId } from "@reach/auto-id";
 import cn from "classnames";
 import type { To } from "react-router-dom";
@@ -25,6 +25,7 @@ export function CdpProductGridItem({
   translations: PickTranslations<"Add to wishlist" | "Remove from wishlist">;
 }) {
   let id = `three-product-grid-item-${useId()}`;
+  let location = useLocation();
 
   return (
     <li>
