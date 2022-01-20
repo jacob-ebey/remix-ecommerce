@@ -5,7 +5,7 @@ import redisClient from "./redis.server";
 import { createVendureProvider } from '~/models/ecommerce-providers/vendure.server';
 
 let commerce = createVendureProvider({
-  shop: process.env.SHOPIFY_STORE!,
+  shopApiUrl: process.env.VENDURE_API_URL!,
   maxAgeSeconds: 60,
   cache: createSwrRedisCache({
     redisClient,

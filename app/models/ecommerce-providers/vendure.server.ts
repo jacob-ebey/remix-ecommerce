@@ -14,24 +14,22 @@ import { getTranslations } from "~/translations.server";
 
 export interface VendureProviderOptions {
     cache?: RequestResponseCache;
+    shopApiUrl: string;
     maxAgeSeconds?: number | ((request: Request) => number);
-    shop: string;
 }
 
 export function createVendureProvider({
                                           cache,
+                                          shopApiUrl,
                                           maxAgeSeconds,
-                                          shop,
                                       }: VendureProviderOptions): EcommerceProvider {
-    let href = `https://demo.vendure.io/shop-api`;
-
     async function query(
         locale: string,
         query: string,
         variables?: any,
         nocache?: boolean
     ) {
-        let request = new Request(href, {
+        let request = new Request(shopApiUrl, {
             method: "POST",
             headers: {
                 "Accept-Language": locale,
@@ -92,7 +90,7 @@ export function createVendureProvider({
                         defaultVariantId: variantId,
                         id: productId,
                         formattedPrice: formatPrice(variant.priceWithTax, currencyCode, locale),
-                        image: product.featuredAsset.preview,
+                        image: product.featuredAsset.preview + '?preset=large',
                         title: product.name,
                         formattedOptions: variant.name,
                         slug: product.slug,
@@ -115,49 +113,6 @@ export function createVendureProvider({
                 items: fullItems,
             };
         },
-        // async getCartInfo(locale, items) {
-        //     let json = await query(locale, getCart);
-        //     if (!json?.data?.activeOrder) {
-        //         return undefined;
-        //     }
-        //     let activeOrder = json.data.activeOrder;
-        //     let fullItems: FullCartItem[] = [];
-        //     for (let item of activeOrder.lines) {
-        //         fullItems.push({
-        //             quantity: item.quantity,
-        //             variantId: item.productVariant.id,
-        //             info: {
-        //                 defaultVariantId: item.productVariant.id,
-        //                 id: item.product.id,
-        //                 formattedPrice: formatPrice(item.linePriceWithTax, activeOrder.currencyCode, locale),
-        //                 image: item.featuredAsset.preview,
-        //                 title: item.productVariant.product.name,
-        //                 formattedOptions: item.productVariant.options.map((o: any) => name).join(', '),
-        //                 slug: item.productVariant.product.slug,
-        //             },
-        //         });
-        //     }
-        //
-        //     if (!fullItems.length) {
-        //         return undefined;
-        //     }
-        //
-        //     let formattedSubTotal = formatPrice(
-        //         activeOrder.subTotal,
-        //         activeOrder.currencyCode,
-        //         locale,
-        //     );
-        //
-        //     let translations = getTranslations(locale, ["Calculated at checkout"]);
-        //
-        //     return {
-        //         formattedShipping: translations["Calculated at checkout"],
-        //         formattedSubTotal: formattedSubTotal,
-        //         formattedTaxes: translations["Calculated at checkout"],
-        //         formattedTotal: formattedSubTotal,
-        //         items: fullItems,
-        //     };
-        // },
         async getCategories(locale, count, nocache) {
             let json = await query(
                 locale,
@@ -187,7 +142,7 @@ export function createVendureProvider({
                     formattedPrice: formatPrice(item.priceWithTax.min, item.currencyCode, locale),
                     id: item.id,
                     defaultVariantId: item.productVariantId,
-                    image: item.productAsset.preview,
+                    image: item.productAsset.preview + '?preset=large',
                     slug: item.slug,
                     title: item.productName,
                 })
@@ -241,8 +196,8 @@ export function createVendureProvider({
                 formattedPrice: formatPrice(price, product.variants[0].currencyCode, locale),
                 id: product.id,
                 defaultVariantId: defaultVariantId!,
-                image: product.featuredAsset.preview,
-                images: product.assets.map((asset: any) => asset.preview),
+                image: product.featuredAsset.preview + '?preset=large',
+                images: product.assets.map((asset: any) => asset.preview + '?preset=large'),
                 slug: product.slug,
                 title: product.name,
                 description: product.description,
@@ -313,14 +268,14 @@ export function createVendureProvider({
                             formattedPrice: formatPrice(item.priceWithTax.min, item.currencyCode, locale),
                             id: item.productId,
                             defaultVariantId: item.productVariantId,
-                            image: item.productAsset.preview,
+                            image: item.productAsset.preview + '?preset=large',
                             slug: item.slug,
                             title: item.productName,
                         };
                     }
                 ) || [];
 
-            return {hasNextPage, nextPageCursor, products};
+            return {hasNextPage, nextPageCursor: nextPageCursor.toString(), products};
         },
         async getSortByOptions(locale) {
             let translations = getTranslations(locale, [
