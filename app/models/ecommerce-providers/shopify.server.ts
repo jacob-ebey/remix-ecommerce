@@ -85,7 +85,8 @@ export function createShopifyProvider({
             formattedPrice: formatPrice(item.priceV2),
             image:
               item.image?.originalSrc ||
-              item.product.images.edges[0].node.originalSrc,
+              item.product.images.edges[0]?.node?.originalSrc ||
+              "",
             title: item.product.title,
             formattedOptions: item.title,
             slug: item.product.handle,
@@ -162,14 +163,17 @@ export function createShopifyProvider({
       let products = json.data.products.edges.map(
         ({
           node: { id, handle, title, images, priceRange, variants },
-        }: any): Product => ({
-          formattedPrice: formatPrice(priceRange.minVariantPrice),
-          id,
-          defaultVariantId: variants.edges[0].node.id,
-          image: images.edges[0].node.originalSrc,
-          slug: handle,
-          title,
-        })
+        }: any): Product => {
+          console.log(images, variants);
+          return {
+            formattedPrice: formatPrice(priceRange.minVariantPrice),
+            id,
+            defaultVariantId: variants.edges[0].node.id,
+            image: images?.edges[0]?.node?.originalSrc || "",
+            slug: handle,
+            title,
+          };
+        }
       );
 
       return products;
@@ -250,7 +254,7 @@ export function createShopifyProvider({
         formattedPrice: formatPrice(price),
         id,
         defaultVariantId: defaultVariantId!,
-        image: images.edges[0].node.originalSrc,
+        image: images.edges[0]?.node?.originalSrc || "",
         images: images.edges.map(
           ({ node: { originalSrc } }: any) => originalSrc
         ),
@@ -340,7 +344,7 @@ export function createShopifyProvider({
               formattedPrice: formatPrice(priceRange.minVariantPrice),
               id,
               defaultVariantId: variants.edges[0].node.id,
-              image: images.edges[0].node.originalSrc,
+              image: images?.edges[0]?.node?.originalSrc || "",
               slug: handle,
               title,
             };
@@ -402,7 +406,8 @@ export function createShopifyProvider({
             formattedPrice: formatPrice(item.priceV2),
             image:
               item.image?.originalSrc ||
-              item.product.images.edges[0].node.originalSrc,
+              item.product.images.edges[0]?.node?.originalSrc ||
+              "",
             title: item.product.title,
             formattedOptions: item.title,
             slug: item.product.handle,
