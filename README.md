@@ -1,12 +1,30 @@
-# Welcome to Remix!
+# R E M I X &nbsp; E - C O M M E R C E
 
+Shopify e-commerce site running on Remix. Inspired by [verce/commerce](https://github.com/vercel/commerce).
+
+### Useful Links
+
+- [Original Blog Post](https://remix.run/blog/remix-vs-next/)
 - [Remix Docs](https://remix.run/docs)
 
-## Development
+## Getting Started
 
-From your terminal:
+This app requires the following to run:
+
+- [node.js](https://www.nodejs.com) version 14+
+- [Docker](https://www.docker.com) to set up and deploy our Redis cache and app.
 
 ```sh
+# clone the repo
+git clone git@github.com:jacob-ebey/remix-ecommerce.git && cd remix-ecommerce
+
+# have Docker install and set up our Redis cache
+docker-compose up -d
+
+# install packages
+npm install
+
+# run the app
 npm run dev
 ```
 
