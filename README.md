@@ -1,4 +1,4 @@
-# R E M I X &nbsp; E - C O M M E R C E
+# Remix E-Commerce
 
 Shopify e-commerce site running on Remix. Inspired by [verce/commerce](https://github.com/vercel/commerce).
 
