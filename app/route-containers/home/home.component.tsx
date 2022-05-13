@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useLoaderData } from "remix";
+import { useLoaderData } from "@remix-run/react";
 
 import { CtaBanner } from "~/components/cta-banner";
 import { ThreeProductGrid } from "~/components/three-product-grid";

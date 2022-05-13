@@ -5,7 +5,7 @@ import path from "path";
 import https from "https";
 import { PassThrough } from "stream";
 import type { Readable } from "stream";
-import type { LoaderFunction } from "remix";
+import type { LoaderFunction } from "@remix-run/node";
 import sharp from "sharp";
 import type { Request as NodeRequest } from "@remix-run/node";
 import { Response as NodeResponse } from "@remix-run/node";

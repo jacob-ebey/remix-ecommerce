@@ -1,5 +1,5 @@
-import { redirect } from "remix";
-import type { ActionFunction, LoaderFunction } from "remix";
+import { redirect } from "@remix-run/node";
+import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 
 import commerce from "~/commerce.server";
 import { getSession } from "~/session.server";

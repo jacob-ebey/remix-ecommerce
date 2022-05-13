@@ -1,5 +1,11 @@
 import type { ChangeEventHandler } from "react";
-import { Form, Link, useLoaderData, useLocation, useSubmit } from "remix";
+import {
+  Form,
+  Link,
+  useLoaderData,
+  useLocation,
+  useSubmit,
+} from "@remix-run/react";
 
 import { CdpProductGridItem } from "~/components/cdp-product-grid-item";
 
