@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import type { ReactNode } from "react";
 import type { To } from "react-router-dom";
-import { Link } from "remix";
+import { Link } from "@remix-run/react";
 import cn from "classnames";
 
 import { OptimizedImage } from "./optimized-image";

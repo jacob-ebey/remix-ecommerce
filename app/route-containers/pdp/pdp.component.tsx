@@ -1,5 +1,5 @@
-import { useLoaderData } from "remix";
-import type { ShouldReloadFunction } from "remix";
+import { useLoaderData } from "@remix-run/react";
+import type { ShouldReloadFunction } from "@remix-run/react";
 
 import { ProductDetails } from "~/components/product-details";
 

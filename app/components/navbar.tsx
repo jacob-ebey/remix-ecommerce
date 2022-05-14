@@ -1,5 +1,5 @@
 import { Fragment, lazy, Suspense, useState } from "react";
-import { Form, Link, PrefetchPageLinks } from "remix";
+import { Form, Link, PrefetchPageLinks } from "@remix-run/react";
 import type { To } from "react-router-dom";
 import { Popover, Transition } from "@headlessui/react";
 

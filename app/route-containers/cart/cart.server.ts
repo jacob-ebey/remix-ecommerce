@@ -1,5 +1,9 @@
-import { json, redirect } from "remix";
-import type { ActionFunction, HeadersFunction, LoaderFunction } from "remix";
+import { json, redirect } from "@remix-run/node";
+import type {
+  ActionFunction,
+  HeadersFunction,
+  LoaderFunction,
+} from "@remix-run/node";
 
 import { updateCartItem, removeCartItem, getSession } from "~/session.server";
 import { getTranslations, PickTranslations } from "~/translations.server";

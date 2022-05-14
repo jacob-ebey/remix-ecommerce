@@ -1,4 +1,4 @@
-import { useLoaderData } from "remix";
+import { useLoaderData } from "@remix-run/react";
 
 import { WishlistListItem } from "~/components/wishlist-listitem";
 import { WishlistIcon } from "~/components/icons";

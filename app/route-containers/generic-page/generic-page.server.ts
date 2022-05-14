@@ -1,5 +1,5 @@
-import { json } from "remix";
-import type { LoaderFunction } from "remix";
+import { json } from "@remix-run/node";
+import type { LoaderFunction } from "@remix-run/node";
 
 import commerce from "~/commerce.server";
 import { getSession } from "~/session.server";

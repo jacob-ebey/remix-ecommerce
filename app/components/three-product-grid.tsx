@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useMemo } from "react";
-import { Link, useFetcher, useLocation } from "remix";
+import { Link, useFetcher, useLocation } from "@remix-run/react";
 import type { To } from "react-router-dom";
 import cn from "classnames";
 import { useId } from "@reach/auto-id";

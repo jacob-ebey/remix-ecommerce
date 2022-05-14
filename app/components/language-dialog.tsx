@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from "react";
-import { Form, useLocation } from "remix";
+import { Form, useLocation } from "@remix-run/react";
 import { Dialog, Transition } from "@headlessui/react";
 
 import { Language, validateLanguage } from "~/models/language";

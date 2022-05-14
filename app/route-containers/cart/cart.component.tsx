@@ -1,4 +1,4 @@
-import { useLoaderData } from "remix";
+import { useLoaderData } from "@remix-run/react";
 
 import { CartListItem } from "~/components/cart-listitem";
 import { CheckoutForm } from "~/components/checkout-form";

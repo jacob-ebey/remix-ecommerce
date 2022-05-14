@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import type { MouseEventHandler } from "react";
-import { Form, useLocation, useSearchParams, useTransition } from "remix";
+import {
+  Form,
+  useLocation,
+  useTransition,
+  useSearchParams,
+} from "@remix-run/react";
 import cn from "classnames";
 
 import type { FullProduct } from "~/models/ecommerce-provider.server";

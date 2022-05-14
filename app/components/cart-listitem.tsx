@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useFetcher, useLocation } from "remix";
+import { useFetcher, useLocation } from "@remix-run/react";
 import cn from "classnames";
 
 import { PickTranslations } from "~/translations.server";

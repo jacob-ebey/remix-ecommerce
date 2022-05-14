@@ -2,7 +2,6 @@ import { Suspense, lazy, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import {
   Links,
-  LinksFunction,
   LiveReload,
   Meta,
   Outlet,
@@ -10,8 +9,9 @@ import {
   ScrollRestoration,
   useLoaderData,
   useMatches,
-} from "remix";
-import type { MetaFunction, ShouldReloadFunction } from "remix";
+} from "@remix-run/react";
+import type { MetaFunction, LinksFunction } from "@remix-run/node";
+import type { ShouldReloadFunction } from "@remix-run/react";
 
 import { ClientOnly } from "~/components/client-only";
 import { Footer } from "~/components/footer";

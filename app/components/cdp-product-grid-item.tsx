@@ -1,4 +1,4 @@
-import { Form, Link, useLocation } from "remix";
+import { Form, Link, useLocation } from "@remix-run/react";
 import { useId } from "@reach/auto-id";
 import cn from "classnames";
 import type { To } from "react-router-dom";
