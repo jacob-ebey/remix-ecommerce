@@ -1,19 +1,19 @@
-import { useLoaderData } from "remix";
+import { useLoaderData } from "@remix-run/react";
 
 import { WishlistListItem } from "~/components/wishlist-listitem";
 import { WishlistIcon } from "~/components/icons";
 
-import type { LoaderData } from "./wishlist.server";
+import type { loader } from "./wishlist.server";
 
 export default function Wishlist() {
-  let { wishlist, translations } = useLoaderData<LoaderData>();
+  let { wishlist, translations } = useLoaderData<typeof loader>();
 
   return (
-    <main className="p-4 lg:p-6 max-w-xl mx-auto">
-      <h1 className="text-3xl mb-8">{translations.Wishlist}</h1>
+    <main className="max-w-xl p-4 mx-auto lg:p-6">
+      <h1 className="mb-8 text-3xl">{translations.Wishlist}</h1>
       {!wishlist ? (
-        <div className="flex flex-col justify-center items-center">
-          <span className="border border-dashed border-primary rounded-full flex items-center justify-center w-24 h-24 bg-secondary text-secondary">
+        <div className="flex flex-col items-center justify-center">
+          <span className="flex items-center justify-center w-24 h-24 border border-dashed rounded-full border-primary bg-secondary text-secondary">
             <WishlistIcon className="block w-8 h-8" />
           </span>
           <h1 className="pt-6 text-2xl font-bold tracking-wide text-center">

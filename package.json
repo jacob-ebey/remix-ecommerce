@@ -16,26 +16,24 @@
     "cypress": "cypress open",
     "start": "remix-serve build",
     "postinstall": "run-s setup:*",
-    "setup:install-sharp": "(cd ./node_modules/sharp && npm run install)",
-    "setup:remix": "remix setup node"
+    "setup:install-sharp": "(cd ./node_modules/sharp && npm run install)"
   },
   "dependencies": {
     "@headlessui/react": "^1.4.2",
     "@reach/auto-id": "^0.16.0",
-    "@remix-run/node": "1.2.0-pre.1",
-    "@remix-run/react": "1.2.0-pre.1",
-    "@remix-run/serve": "1.2.0-pre.1",
+    "@remix-run/node": "^1.3.3",
+    "@remix-run/react": "^1.3.3",
+    "@remix-run/serve": "^1.3.3",
     "@shopify/shopify-api": "^2.0.0",
     "classnames": "^2.3.1",
     "decimal.js": "^10.3.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "redis": "^4.0.1",
-    "remix": "1.2.0-pre.1",
     "sharp": "^0.29.3"
   },
   "devDependencies": {
-    "@remix-run/dev": "1.2.0-pre.1",
+    "@remix-run/dev": "^1.3.3",
     "@tailwindcss/typography": "^0.5.0",
     "@types/react": "^17.0.24",
     "@types/react-dom": "^17.0.9",

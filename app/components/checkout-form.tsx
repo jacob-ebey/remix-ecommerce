@@ -1,4 +1,4 @@
-import { Form } from "remix";
+import { Form } from "@remix-run/react";
 import cn from "classnames";
 
 import type { CartInfo } from "~/models/ecommerce-provider.server";

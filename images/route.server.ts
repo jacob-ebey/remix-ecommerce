@@ -5,10 +5,9 @@ import path from "path";
 import https from "https";
 import { PassThrough } from "stream";
 import type { Readable } from "stream";
-import type { LoaderFunction } from "remix";
 import sharp from "sharp";
-import type { Request as NodeRequest } from "@remix-run/node";
-import { Response as NodeResponse } from "@remix-run/node";
+import type { Request as NodeRequest, LoaderFunction } from "@remix-run/node";
+import { Response as NodeResponse, writeReadableStreamToWritable } from "@remix-run/node";
 
 let badImageBase64 = "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
@@ -89,8 +88,12 @@ export let loader: LoaderFunction = async ({ request }) => {
         rejectUnauthorized: false,
       });
       let imageResponse = await fetch(imgRequest as unknown as Request);
-      imageBody = imageResponse.body as unknown as PassThrough;
       status = imageResponse.status;
+      if (imageResponse.body) {
+        let passThrough = new PassThrough();
+        imageBody = passThrough;
+        writeReadableStreamToWritable(imageResponse.body, passThrough);
+      }
     }
 
     if (!imageBody) {

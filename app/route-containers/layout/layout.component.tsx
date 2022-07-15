@@ -1,8 +1,12 @@
 import { Suspense, lazy, useMemo, useState } from "react";
 import type { ReactNode } from "react";
+import type { MetaFunction } from "@remix-run/node";
+import { LinksFunction } from "@remix-run/node";
+import type { ShouldReloadFunction } from "@remix-run/react";
+import type { UseDataFunctionReturn } from "@remix-run/react/dist/components";
+
 import {
   Links,
-  LinksFunction,
   LiveReload,
   Meta,
   Outlet,
@@ -10,8 +14,7 @@ import {
   ScrollRestoration,
   useLoaderData,
   useMatches,
-} from "remix";
-import type { MetaFunction, ShouldReloadFunction } from "remix";
+} from "@remix-run/react";
 
 import { ClientOnly } from "~/components/client-only";
 import { Footer } from "~/components/footer";
@@ -22,7 +25,7 @@ import globalStylesheetHref from "~/styles/global.css";
 
 import { GenericCatchBoundary } from "../boundaries/generic-catch-boundary";
 import { GenericErrorBoundary } from "../boundaries/generic-error-boundary";
-import type { LoaderData } from "./layout.server";
+import type { loader } from "./layout.server";
 
 let CartPopover = lazy(() =>
   import("~/components/cart-popover").then(({ CartPopover }) => ({
@@ -56,13 +59,13 @@ export let links: LinksFunction = () => {
   ];
 };
 
-export function Document({
-  children,
-  loaderData,
-}: {
-  children: ReactNode;
-  loaderData?: LoaderData;
-}) {
+export function Document({ children }: { children: ReactNode }) {
+  let matches = useMatches();
+  let rootMatch = matches.find((match) => match.id === "root");
+  let loaderData = rootMatch?.data as
+    | UseDataFunctionReturn<typeof loader>
+    | undefined;
+
   let { cart, categories, lang, pages, translations, wishlist } =
     loaderData || {
       lang: "en",
@@ -99,7 +102,7 @@ export function Document({
   );
 
   return (
-    <html lang={lang} className="bg-zinc-900 text-gray-100">
+    <html lang={lang} className="text-gray-100 bg-zinc-900">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -171,24 +174,16 @@ export function Document({
 }
 
 export function CatchBoundary() {
-  let matches = useMatches();
-  let matchWithLang = matches.find((match) => match.data?.lang);
-  let loaderData = matchWithLang?.data as LoaderData | undefined;
-
   return (
-    <Document loaderData={loaderData}>
+    <Document>
       <GenericCatchBoundary />
     </Document>
   );
 }
 
 export function ErrorBoundary({ error }: { error: Error }) {
-  let matches = useMatches();
-  let matchWithLang = matches.find((match) => match.data?.lang);
-  let loaderData = matchWithLang?.data as LoaderData | undefined;
-
   return (
-    <Document loaderData={loaderData}>
+    <Document>
       <GenericErrorBoundary error={error} />
     </Document>
   );
@@ -199,10 +194,8 @@ export let unstable_shouldReload: ShouldReloadFunction = ({ url }) => {
 };
 
 export default function Root() {
-  let loaderData = useLoaderData<LoaderData>();
-
   return (
-    <Document loaderData={loaderData}>
+    <Document>
       <Outlet />
     </Document>
   );

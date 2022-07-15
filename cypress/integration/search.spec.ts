@@ -95,3 +95,5 @@ describe("search", () => {
     cy.url().should("include", "q=shirt");
   });
 });
+
+export {};

@@ -1,5 +1,5 @@
-import { json, redirect } from "remix";
-import type { ActionFunction, HeadersFunction, LoaderFunction } from "remix";
+import type { ActionArgs, HeadersFunction, LoaderArgs } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 
 import {
   updateCartItem,
@@ -8,16 +8,15 @@ import {
   removeWishlistItem,
   getSession,
 } from "~/session.server";
-import { getTranslations, PickTranslations } from "~/translations.server";
+import { getTranslations } from "~/translations.server";
 import commerce from "~/commerce.server";
-import type { FullWishlistItem } from "~/models/ecommerce-provider.server";
 import { validateRedirect } from "~/utils/redirect.server";
 
 export let headers: HeadersFunction = ({ actionHeaders }) => {
   return actionHeaders;
 };
 
-export let action: ActionFunction = async ({ request, params }) => {
+export async function action({ request, params }: ActionArgs) {
   let [body, session] = await Promise.all([
     request.text(),
     getSession(request, params),
@@ -95,29 +94,16 @@ export let action: ActionFunction = async ({ request, params }) => {
   }
 
   return redirect(redirectTo);
-};
+}
 
-export type LoaderData = {
-  wishlist?: FullWishlistItem[];
-  translations: PickTranslations<
-    | "Add item"
-    | "Remove from wishlist"
-    | "Subtract item"
-    | "Quantity: $1"
-    | "Your wishlist is empty"
-    | "Wishlist"
-    | "Move to cart"
-  >;
-};
-
-export let loader: LoaderFunction = async ({ request, params }) => {
+export async function loader({ request, params }: LoaderArgs) {
   let session = await getSession(request, params);
   let lang = session.getLanguage();
   let wishlist = await session
     .getWishlist()
     .then((wishlistItems) => commerce.getWishlistInfo(lang, wishlistItems));
 
-  return json<LoaderData>({
+  return json({
     wishlist,
     translations: getTranslations(lang, [
       "Add item",
@@ -129,4 +115,4 @@ export let loader: LoaderFunction = async ({ request, params }) => {
       "Move to cart",
     ]),
   });
-};
+}
