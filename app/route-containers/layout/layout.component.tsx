@@ -208,8 +208,6 @@ function Document({ children }: { children: ReactNode }) {
     pages: [],
   };
 
-  console.log({ wishlist });
-
   return (
     <html lang={lang} className="text-gray-100 bg-zinc-900">
       <head>
