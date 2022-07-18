@@ -1,20 +1,20 @@
-import { useLoaderData } from "remix";
+import { useLoaderData } from "@remix-run/react";
 
 import { CartListItem } from "~/components/cart-listitem";
 import { CheckoutForm } from "~/components/checkout-form";
 import { CartIcon } from "~/components/icons";
 
-import type { LoaderData } from "./cart.server";
+import type { loader } from "./cart.server";
 
 export default function Cart() {
-  let { cart, translations } = useLoaderData<LoaderData>();
+  let { cart, translations } = useLoaderData<typeof loader>();
 
   return (
-    <main className="p-4 lg:p-6 max-w-xl mx-auto">
-      <h1 className="text-3xl mb-8">{translations.Cart}</h1>
+    <main className="max-w-xl p-4 mx-auto lg:p-6">
+      <h1 className="mb-8 text-3xl">{translations.Cart}</h1>
       {!cart?.items ? (
-        <div className="flex flex-col justify-center items-center">
-          <span className="border border-dashed border-primary rounded-full flex items-center justify-center w-24 h-24 bg-secondary text-secondary">
+        <div className="flex flex-col items-center justify-center">
+          <span className="flex items-center justify-center w-24 h-24 border border-dashed rounded-full border-primary bg-secondary text-secondary">
             <CartIcon className="block w-8 h-8" />
           </span>
           <h1 className="pt-6 text-2xl font-bold tracking-wide text-center">
@@ -39,7 +39,7 @@ export default function Cart() {
           </ul>
 
           <CheckoutForm
-            className="mt-24 pt-4 border-t border-zinc-700"
+            className="pt-4 mt-24 border-t border-zinc-700"
             cart={cart}
             translations={translations}
           />

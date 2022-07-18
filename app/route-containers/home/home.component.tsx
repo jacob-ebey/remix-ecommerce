@@ -1,11 +1,11 @@
 import { useMemo } from "react";
-import { useLoaderData } from "remix";
+import { useLoaderData } from "@remix-run/react";
 
 import { CtaBanner } from "~/components/cta-banner";
 import { ThreeProductGrid } from "~/components/three-product-grid";
 import { ScrollingProductList } from "~/components/scrolling-product-list";
 
-import type { LoaderData } from "./home.server";
+import type { loader } from "./home.server";
 
 function chunkProducts<T>(start: number, goal: number, products: T[]) {
   let slice = products.slice(start, start + 3);
@@ -19,7 +19,7 @@ function chunkProducts<T>(start: number, goal: number, products: T[]) {
 }
 
 export default function IndexPage() {
-  let { featuredProducts, translations } = useLoaderData<LoaderData>();
+  let { featuredProducts, translations } = useLoaderData<typeof loader>();
 
   return (
     <main>

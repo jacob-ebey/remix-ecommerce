@@ -1,18 +1,16 @@
-import { json, redirect } from "remix";
-import type { ActionFunction, HeadersFunction, LoaderFunction } from "remix";
+import type { ActionArgs, HeadersFunction, LoaderArgs } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 
 import commerce from "~/commerce.server";
 import { addToCart, getSession } from "~/session.server";
 import { getTranslations } from "~/translations.server";
-import type { PickTranslations } from "~/translations.server";
-import type { FullProduct } from "~/models/ecommerce-provider.server";
 import { validateRedirect } from "~/utils/redirect.server";
 
 export let headers: HeadersFunction = ({ actionHeaders }) => {
   return actionHeaders;
 };
 
-export let action: ActionFunction = async ({ request, params }) => {
+export async function action({ request, params }: ActionArgs) {
   let [body, session] = await Promise.all([
     request.text(),
     getSession(request, params),
@@ -35,14 +33,9 @@ export let action: ActionFunction = async ({ request, params }) => {
       "Set-Cookie": await session.commitSession(),
     },
   });
-};
+}
 
-export type LoaderData = {
-  product: FullProduct;
-  translations: PickTranslations<"Add to cart" | "Sold out">;
-};
-
-export let loader: LoaderFunction = async ({ request, params }) => {
+export async function loader({ request, params }: LoaderArgs) {
   let url = new URL(request.url);
 
   let slug = params.slug?.trim();
@@ -65,8 +58,13 @@ export let loader: LoaderFunction = async ({ request, params }) => {
     throw json(`Product "${slug}" not found`, { status: 404 });
   }
 
-  return json<LoaderData>({
+  return json({
     product,
-    translations: getTranslations(lang, ["Add to cart", "Sold out"]),
+    translations: getTranslations(lang, [
+      "Add to cart",
+      "Sold out",
+      "Added!",
+      "Adding",
+    ]),
   });
-};
+}

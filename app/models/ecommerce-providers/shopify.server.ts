@@ -61,7 +61,7 @@ export function createShopifyProvider({
       });
 
       if (!json?.data?.nodes) {
-        return undefined;
+        return null;
       }
       let subtotal = new Decimal(0);
       let itemsMap = new Map(items.map((item) => [item.variantId, item]));
@@ -94,7 +94,7 @@ export function createShopifyProvider({
       }
 
       if (!fullItems.length) {
-        return undefined;
+        return null;
       }
 
       let formattedSubTotal = formatPrice({
@@ -178,7 +178,7 @@ export function createShopifyProvider({
       let json = await query(locale, getPageQuery, { query: `handle:${slug}` });
       let page = json.data.pages.edges[0]?.node;
       if (!page) {
-        return undefined;
+        return null;
       }
 
       return {
@@ -203,7 +203,7 @@ export function createShopifyProvider({
       let json = await query(locale, getProductQuery, { slug });
 
       if (!json.data.productByHandle) {
-        return undefined;
+        return null;
       }
 
       let {
@@ -381,7 +381,7 @@ export function createShopifyProvider({
       });
 
       if (!json?.data?.nodes) {
-        return undefined;
+        return null;
       }
 
       let itemsMap = new Map(items.map((item) => [item.variantId, item]));
@@ -411,7 +411,7 @@ export function createShopifyProvider({
       }
 
       if (!fullItems.length) {
-        return undefined;
+        return null;
       }
 
       return fullItems;

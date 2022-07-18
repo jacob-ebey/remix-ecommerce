@@ -1,15 +1,10 @@
-import { json } from "remix";
-import type { LoaderFunction } from "remix";
+import type { LoaderArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
 
 import commerce from "~/commerce.server";
 import { getSession } from "~/session.server";
-import type { FullPage } from "~/models/ecommerce-provider.server";
 
-export type LoaderData = {
-  page: FullPage;
-};
-
-export let loader: LoaderFunction = async ({ request, params }) => {
+export async function loader({ request, params }: LoaderArgs) {
   let session = await getSession(request, params);
   let lang = session.getLanguage();
 
@@ -19,7 +14,7 @@ export let loader: LoaderFunction = async ({ request, params }) => {
     throw json("Page not found", { status: 404 });
   }
 
-  return json<LoaderData>({
+  return json({
     page,
   });
-};
+}

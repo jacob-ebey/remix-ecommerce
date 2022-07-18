@@ -30,3 +30,5 @@ describe("cart", () => {
     cy.get("[data-testid=cart-count]").should("not.exist");
   });
 });
+
+export {};

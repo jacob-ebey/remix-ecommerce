@@ -1,9 +1,15 @@
 import type { ChangeEventHandler } from "react";
-import { Form, Link, useLoaderData, useLocation, useSubmit } from "remix";
+import {
+  Form,
+  Link,
+  useLoaderData,
+  useLocation,
+  useSubmit,
+} from "@remix-run/react";
 
 import { CdpProductGridItem } from "~/components/cdp-product-grid-item";
 
-import type { LoaderData } from "./cdp.server";
+import type { loader } from "./cdp.server";
 
 export default function CDP() {
   let {
@@ -16,7 +22,7 @@ export default function CDP() {
     hasNextPage,
     nextPageCursor,
     translations,
-  } = useLoaderData<LoaderData>();
+  } = useLoaderData<typeof loader>();
   let submit = useSubmit();
   let location = useLocation();
 
@@ -25,8 +31,8 @@ export default function CDP() {
   };
 
   return (
-    <main className="lg:grid gap-6 grid-cols-12">
-      <nav className="hidden lg:block col-span-2 py-8 pl-6">
+    <main className="grid-cols-12 gap-6 lg:grid">
+      <nav className="hidden col-span-2 py-8 pl-6 lg:block">
         <h1 className="text-lg font-semibold">Categories</h1>
         <ul>
           {categories.map((cat) => (
@@ -56,7 +62,7 @@ export default function CDP() {
           ))}
         </ul>
 
-        <h1 className="text-lg font-semibold mt-8">Sort By</h1>
+        <h1 className="mt-8 text-lg font-semibold">Sort By</h1>
         <ul>
           {sortByOptions.map((sortBy) => (
             <li
@@ -101,7 +107,7 @@ export default function CDP() {
             data-testid="category-select"
             key={category}
             defaultValue={category}
-            className="bg-zinc-900 border border-zinc-700 w-full block p-2"
+            className="block w-full p-2 border bg-zinc-900 border-zinc-700"
             onChange={submitForm}
             name="category"
           >
@@ -113,7 +119,7 @@ export default function CDP() {
           </select>
         </label>
         <noscript>
-          <button className="block mt-4 px-4 py-2 border border-zinc-700">
+          <button className="block px-4 py-2 mt-4 border border-zinc-700">
             Update
           </button>
         </noscript>
@@ -135,7 +141,7 @@ export default function CDP() {
             data-testid="sort-by-select"
             key={sort}
             defaultValue={sort}
-            className="bg-zinc-900 border border-zinc-700 w-full block p-2 mt-4"
+            className="block w-full p-2 mt-4 border bg-zinc-900 border-zinc-700"
             onChange={submitForm}
             name="sort"
           >
@@ -147,18 +153,18 @@ export default function CDP() {
           </select>
         </label>
         <noscript>
-          <button className="block mt-4 px-4 py-2 border border-zinc-700">
+          <button className="block px-4 py-2 mt-4 border border-zinc-700">
             Update
           </button>
         </noscript>
       </Form>
 
-      <article className="sm:px-4 lg:px-0 lg:pr-6 mb-8 col-start-3 col-span-10">
+      <article className="col-span-10 col-start-3 mb-8 sm:px-4 lg:px-0 lg:pr-6">
         <p data-testid="search-results-label" className="pl-4 mt-4 mb-8">
           Showing {products.length} results
           {search ? ` for "${search}"` : ""}
         </p>
-        <ul className="grid gap-4 grid-flow-row sm:grid-cols-2 md:grid-cols-3">
+        <ul className="grid grid-flow-row gap-4 sm:grid-cols-2 md:grid-cols-3">
           {products.map((product, index) => (
             <CdpProductGridItem
               key={product.id}

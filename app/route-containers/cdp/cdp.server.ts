@@ -1,17 +1,12 @@
-import { json } from "remix";
-import type { LoaderFunction } from "remix";
+import type { LoaderArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import type { To } from "react-router-dom";
 
-import type {
-  Category,
-  SortByOption,
-} from "~/models/ecommerce-provider.server";
 import commerce from "~/commerce.server";
 import { getSession } from "~/session.server";
 import { getTranslations } from "~/translations.server";
-import type { PickTranslations } from "~/translations.server";
 
-export type CDPProduct = {
+type CDPProduct = {
   id: string;
   title: string;
   formattedPrice: string;
@@ -21,19 +16,7 @@ export type CDPProduct = {
   defaultVariantId: string;
 };
 
-export type LoaderData = {
-  category?: string;
-  sort?: string;
-  categories: Category[];
-  search?: string;
-  sortByOptions: SortByOption[];
-  products: CDPProduct[];
-  hasNextPage: boolean;
-  nextPageCursor?: string;
-  translations: PickTranslations<"Add to wishlist" | "Remove from wishlist">;
-};
-
-export let loader: LoaderFunction = async ({ request, params }) => {
+export async function loader({ request, params }: LoaderArgs) {
   let session = await getSession(request, params);
   let lang = session.getLanguage();
   let url = new URL(request.url);
@@ -60,7 +43,7 @@ export let loader: LoaderFunction = async ({ request, params }) => {
     "Remove from wishlist",
   ]);
 
-  return json<LoaderData>({
+  return json({
     category,
     sort,
     categories,
@@ -68,7 +51,7 @@ export let loader: LoaderFunction = async ({ request, params }) => {
     sortByOptions,
     hasNextPage: productsPage.hasNextPage,
     nextPageCursor: productsPage.nextPageCursor,
-    products: productsPage.products.map((product) => ({
+    products: productsPage.products.map<CDPProduct>((product) => ({
       favorited: wishlistHasProduct.has(product.id),
       formattedPrice: product.formattedPrice,
       id: product.id,
@@ -79,4 +62,4 @@ export let loader: LoaderFunction = async ({ request, params }) => {
     })),
     translations,
   });
-};
+}

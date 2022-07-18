@@ -1,9 +1,8 @@
 import type { ReactNode } from "react";
-import { useMemo } from "react";
-import { Link, useFetcher, useLocation } from "remix";
+import { useMemo, useId } from "react";
+import { Link, useFetcher, useLocation } from "@remix-run/react";
 import type { To } from "react-router-dom";
 import cn from "classnames";
-import { useId } from "@reach/auto-id";
 
 import { WishlistIcon } from "./icons";
 import { OptimizedImage } from "./optimized-image";
@@ -51,7 +50,7 @@ function ThreeProductGridItem({
           aria-labelledby={id}
         >
           <OptimizedImage
-            className="object-cover w-full h-full transform transition duration-500 motion-safe:group-focus:scale-110 motion-safe:group-hover:scale-110"
+            className="object-cover w-full h-full transition duration-500 transform motion-safe:group-focus:scale-110 motion-safe:group-hover:scale-110"
             src={product.image}
             width={480}
             height={480}
@@ -100,15 +99,15 @@ function ThreeProductGridItem({
             <Link
               prefetch="intent"
               to={product.to}
-              className="group-tpgi block flex-1"
+              className="flex-1 block group-tpgi"
               tabIndex={-1}
               id={id}
             >
-              <h1 className="inline-block py-2 px-4 bg-zinc-900 text-2xl font-semibold">
+              <h1 className="inline-block px-4 py-2 text-2xl font-semibold bg-zinc-900">
                 {product.title}
               </h1>
               <br />
-              <p className="inline-block text-sm py-2 px-4 bg-zinc-900">
+              <p className="inline-block px-4 py-2 text-sm bg-zinc-900">
                 {product.formattedPrice}
               </p>
             </Link>

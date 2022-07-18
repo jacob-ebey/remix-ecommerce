@@ -38,3 +38,5 @@ describe("wishlist", () => {
     cy.get("[data-testid=close-wishlist]").click();
   });
 });
+
+export {};

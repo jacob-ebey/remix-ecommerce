@@ -1,25 +1,11 @@
-import type { LoaderFunction } from "remix";
-import { json } from "remix";
+import type { LoaderArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
 
 import commerce from "~/commerce.server";
 import { getTranslations } from "~/translations.server";
-import type { PickTranslations } from "~/translations.server";
 import { getSession } from "~/session.server";
 
-import type { ThreeProductGridProduct } from "~/components/three-product-grid";
-
-export type LoaderData = {
-  featuredProducts: ThreeProductGridProduct[];
-  translations: PickTranslations<
-    | "MockCTADescription"
-    | "MockCTAHeadline"
-    | "MockCTALink"
-    | "Add to wishlist"
-    | "Remove from wishlist"
-  >;
-};
-
-export let loader: LoaderFunction = async ({ request, params }) => {
+export async function loader({ request, params }: LoaderArgs) {
   let session = await getSession(request, params);
   let lang = session.getLanguage();
   let [featuredProducts, wishlist] = await Promise.all([
@@ -31,7 +17,7 @@ export let loader: LoaderFunction = async ({ request, params }) => {
     wishlist.map<string>((item) => item.productId)
   );
 
-  return json<LoaderData>({
+  return json({
     featuredProducts: featuredProducts.map(
       ({ formattedPrice, id, image, slug, title, defaultVariantId }) => ({
         favorited: wishlistHasProduct.has(id),
@@ -51,4 +37,4 @@ export let loader: LoaderFunction = async ({ request, params }) => {
       "Remove from wishlist",
     ]),
   });
-};
+}

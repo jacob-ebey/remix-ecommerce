@@ -1,17 +1,21 @@
 import { Suspense, lazy, useMemo, useState } from "react";
 import type { ReactNode } from "react";
+import type { LinksFunction, MetaFunction } from "@remix-run/node";
+import { Deferred } from "@remix-run/react";
+import type {
+  ShouldReloadFunction,
+  UseDataFunctionReturn,
+} from "@remix-run/react";
+
 import {
   Links,
-  LinksFunction,
   LiveReload,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
-  useLoaderData,
   useMatches,
-} from "remix";
-import type { MetaFunction, ShouldReloadFunction } from "remix";
+} from "@remix-run/react";
 
 import { ClientOnly } from "~/components/client-only";
 import { Footer } from "~/components/footer";
@@ -22,7 +26,7 @@ import globalStylesheetHref from "~/styles/global.css";
 
 import { GenericCatchBoundary } from "../boundaries/generic-catch-boundary";
 import { GenericErrorBoundary } from "../boundaries/generic-error-boundary";
-import type { LoaderData } from "./layout.server";
+import type { loader } from "./layout.server";
 
 let CartPopover = lazy(() =>
   import("~/components/cart-popover").then(({ CartPopover }) => ({
@@ -56,18 +60,25 @@ export let links: LinksFunction = () => {
   ];
 };
 
-export function Document({
+function Layout({
+  cart,
+  wishlist,
   children,
-  loaderData,
 }: {
-  children: ReactNode;
-  loaderData?: LoaderData;
+  children?: ReactNode;
+  cart?: UseDataFunctionReturn<typeof loader>["cart"];
+  wishlist?: UseDataFunctionReturn<typeof loader>["wishlist"];
 }) {
-  let { cart, categories, lang, pages, translations, wishlist } =
-    loaderData || {
-      lang: "en",
-      pages: [],
-    };
+  let matches = useMatches();
+  let rootMatch = matches.find((match) => match.id === "root");
+  let loaderData = rootMatch?.data as
+    | UseDataFunctionReturn<typeof loader>
+    | undefined;
+
+  let { categories, lang, pages, translations } = loaderData || {
+    lang: "en",
+    pages: [],
+  };
 
   let allCategories = useMemo(() => {
     let results: NavbarCategory[] = translations
@@ -88,18 +99,117 @@ export function Document({
   let [cartOpen, setCartOpen] = useState(false);
   let [wishlistOpen, setWishlistOpen] = useState(false);
 
-  let cartCount = useMemo(
-    () => cart?.items?.reduce((sum, item) => sum + item.quantity, 0),
-    [cart]
-  );
+  return (
+    <>
+      <Deferred
+        value={cart}
+        fallbackElement={
+          <Navbar
+            lang={lang}
+            logoHref={logoHref}
+            storeName={translations?.["Store Name"]}
+            categories={allCategories}
+            translations={translations}
+            onOpenCart={() => setCartOpen(true)}
+            onOpenWishlist={() => setWishlistOpen(true)}
+          />
+        }
+      >
+        {(cart) => (
+          <Deferred
+            value={wishlist}
+            fallbackElement={
+              <Navbar
+                cart={cart}
+                lang={lang}
+                logoHref={logoHref}
+                storeName={translations?.["Store Name"]}
+                categories={allCategories}
+                translations={translations}
+                onOpenCart={() => setCartOpen(true)}
+                onOpenWishlist={() => setWishlistOpen(true)}
+              />
+            }
+          >
+            {(wishlist) => (
+              <Navbar
+                cart={cart}
+                wishlist={wishlist}
+                lang={lang}
+                logoHref={logoHref}
+                storeName={translations?.["Store Name"]}
+                categories={allCategories}
+                translations={translations}
+                onOpenCart={() => setCartOpen(true)}
+                onOpenWishlist={() => setWishlistOpen(true)}
+              />
+            )}
+          </Deferred>
+        )}
+      </Deferred>
+      <div className="flex-1">{children}</div>
+      <Footer
+        lang={lang}
+        logoHref={logoHref}
+        pages={pages}
+        storeName={translations?.["Store Name"]}
+      />
 
-  let wishlistCount = useMemo(
-    () => wishlist?.reduce((sum, item) => sum + item.quantity, 0),
-    [wishlist]
+      {translations ? (
+        <ClientOnly>
+          <Suspense fallback="">
+            <LanguageDialog lang={lang} translations={translations} />
+          </Suspense>
+        </ClientOnly>
+      ) : null}
+
+      {translations ? (
+        <Deferred value={wishlist}>
+          {(wishlist) => (
+            <ClientOnly>
+              <WishlistPopover
+                wishlist={wishlist}
+                open={wishlistOpen}
+                translations={translations!}
+                onClose={() => setWishlistOpen(false)}
+              />
+            </ClientOnly>
+          )}
+        </Deferred>
+      ) : null}
+
+      {translations ? (
+        <Deferred value={cart}>
+          {(cart) => (
+            <ClientOnly>
+              <CartPopover
+                cart={cart}
+                open={cartOpen}
+                translations={translations!}
+                onClose={() => setCartOpen(false)}
+              />
+            </ClientOnly>
+          )}
+        </Deferred>
+      ) : null}
+    </>
   );
+}
+
+function Document({ children }: { children: ReactNode }) {
+  let matches = useMatches();
+  let rootMatch = matches.find((match) => match.id === "root");
+  let loaderData = rootMatch?.data as
+    | UseDataFunctionReturn<typeof loader>
+    | undefined;
+
+  let { cart, lang, wishlist } = loaderData || {
+    lang: "en",
+    pages: [],
+  };
 
   return (
-    <html lang={lang} className="bg-zinc-900 text-gray-100">
+    <html lang={lang} className="text-gray-100 bg-zinc-900">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -107,60 +217,9 @@ export function Document({
         <Links />
       </head>
       <body className="flex flex-col min-h-screen">
-        <Navbar
-          cartCount={cartCount}
-          wishlistCount={wishlistCount}
-          lang={lang}
-          logoHref={logoHref}
-          storeName={translations?.["Store Name"]}
-          categories={allCategories}
-          translations={translations}
-          onOpenCart={() => setCartOpen(true)}
-          onOpenWishlist={() => setWishlistOpen(true)}
-        />
-        <div className="flex-1">{children}</div>
-        <Footer
-          lang={lang}
-          logoHref={logoHref}
-          pages={pages}
-          storeName={translations?.["Store Name"]}
-        />
-
-        {translations ? (
-          <ClientOnly>
-            <Suspense fallback="">
-              <LanguageDialog lang={lang} translations={translations} />
-            </Suspense>
-          </ClientOnly>
-        ) : null}
-
-        {translations ? (
-          <ClientOnly>
-            <Suspense fallback="">
-              <WishlistPopover
-                wishlistCount={wishlistCount}
-                wishlist={wishlist}
-                open={wishlistOpen}
-                translations={translations}
-                onClose={() => setWishlistOpen(false)}
-              />
-            </Suspense>
-          </ClientOnly>
-        ) : null}
-
-        {translations ? (
-          <ClientOnly>
-            <Suspense fallback="">
-              <CartPopover
-                cartCount={cartCount}
-                cart={cart}
-                open={cartOpen}
-                translations={translations}
-                onClose={() => setCartOpen(false)}
-              />
-            </Suspense>
-          </ClientOnly>
-        ) : null}
+        <Layout cart={cart} wishlist={wishlist}>
+          {children}
+        </Layout>
 
         <ScrollRestoration />
         <Scripts />
@@ -171,24 +230,16 @@ export function Document({
 }
 
 export function CatchBoundary() {
-  let matches = useMatches();
-  let matchWithLang = matches.find((match) => match.data?.lang);
-  let loaderData = matchWithLang?.data as LoaderData | undefined;
-
   return (
-    <Document loaderData={loaderData}>
+    <Document>
       <GenericCatchBoundary />
     </Document>
   );
 }
 
 export function ErrorBoundary({ error }: { error: Error }) {
-  let matches = useMatches();
-  let matchWithLang = matches.find((match) => match.data?.lang);
-  let loaderData = matchWithLang?.data as LoaderData | undefined;
-
   return (
-    <Document loaderData={loaderData}>
+    <Document>
       <GenericErrorBoundary error={error} />
     </Document>
   );
@@ -199,10 +250,8 @@ export let unstable_shouldReload: ShouldReloadFunction = ({ url }) => {
 };
 
 export default function Root() {
-  let loaderData = useLoaderData<LoaderData>();
-
   return (
-    <Document loaderData={loaderData}>
+    <Document>
       <Outlet />
     </Document>
   );

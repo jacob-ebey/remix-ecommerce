@@ -20,3 +20,5 @@ describe("language", () => {
     cy.get("html").should("have.attr", "lang", "es");
   });
 });
+
+export {};
