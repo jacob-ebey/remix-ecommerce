@@ -1,5 +1,5 @@
+import { useId } from "react";
 import { Form, Link, useLocation } from "@remix-run/react";
-import { useId } from "@reach/auto-id";
 import cn from "classnames";
 import type { To } from "react-router-dom";
 
@@ -29,7 +29,7 @@ export function CdpProductGridItem({
 
   return (
     <li>
-      <div className="group block relative aspect-square overflow-hidden bg-zinc-800">
+      <div className="relative block overflow-hidden group aspect-square bg-zinc-800">
         <Link
           className="block group"
           prefetch="intent"
@@ -37,7 +37,7 @@ export function CdpProductGridItem({
           aria-labelledby={id}
         >
           <OptimizedImage
-            className="object-cover w-full h-full transform transition duration-500 motion-safe:group-focus:scale-110 motion-safe:group-hover:scale-110"
+            className="object-cover w-full h-full transition duration-500 transform motion-safe:group-focus:scale-110 motion-safe:group-hover:scale-110"
             src={product.image}
             width={480}
             height={480}
@@ -63,15 +63,15 @@ export function CdpProductGridItem({
             <Link
               prefetch="intent"
               to={product.to}
-              className="group-tpgi block flex-1"
+              className="flex-1 block group-tpgi"
               tabIndex={-1}
               id={id}
             >
-              <h1 className="inline-block py-2 px-4 bg-zinc-900 text-2xl font-semibold">
+              <h1 className="inline-block px-4 py-2 text-2xl font-semibold bg-zinc-900">
                 {product.title}
               </h1>
               <br />
-              <p className="inline-block text-sm py-2 px-4 bg-zinc-900">
+              <p className="inline-block px-4 py-2 text-sm bg-zinc-900">
                 {product.formattedPrice}
               </p>
             </Link>

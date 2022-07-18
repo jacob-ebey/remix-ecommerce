@@ -1,5 +1,5 @@
 import type { LoaderArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import { deferred } from "@remix-run/node";
 
 import commerce from "~/commerce.server";
 import { getSession } from "~/session.server";
@@ -8,7 +8,7 @@ import { getTranslations } from "~/translations.server";
 export async function loader({ request, params }: LoaderArgs) {
   let session = await getSession(request, params);
   let lang = session.getLanguage();
-  let [categories, pages, cart, wishlist] = await Promise.all([
+  let [categories, pages, cart, wishlist] = [
     commerce.getCategories(lang, 2),
     commerce.getPages(lang),
     session
@@ -17,7 +17,7 @@ export async function loader({ request, params }: LoaderArgs) {
     session
       .getWishlist()
       .then((wishlistItems) => commerce.getWishlistInfo(lang, wishlistItems)),
-  ]);
+  ];
 
   let translations = getTranslations(lang, [
     "All",
@@ -48,7 +48,7 @@ export async function loader({ request, params }: LoaderArgs) {
     "Move to cart",
   ]);
 
-  return json({
+  return deferred({
     cart,
     lang,
     pages: [
@@ -57,14 +57,14 @@ export async function loader({ request, params }: LoaderArgs) {
         title: translations.Home,
         to: `/${lang}`,
       },
-      ...pages.map(({ id, slug, title }) => ({
+      ...(await pages).map(({ id, slug, title }) => ({
         id,
         title,
         to: `/${lang}/${slug}`,
       })),
     ],
     categories: [
-      ...categories.map(({ name, slug }) => ({
+      ...(await categories).map(({ name, slug }) => ({
         name,
         to: `${lang}/search?category=${slug}`,
       })),

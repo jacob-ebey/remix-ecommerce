@@ -51,7 +51,7 @@ export function CartListItem({
   return (
     <li key={variantId} className="mb-6" hidden={optimisticDeleting}>
       <div className="flex">
-        <div className="relative block aspect-square w-16 mr-4">
+        <div className="relative block w-16 mr-4 aspect-square">
           <OptimizedImage
             className="absolute inset-0 bg-pink-brand"
             src={image}
@@ -98,20 +98,20 @@ export function CartListItem({
           <button
             data-testid="remove-from-cart"
             type="submit"
-            className="w-9 h-9 flex items-center justify-center border border-zinc-700 mr-2"
+            className="flex items-center justify-center mr-2 border w-9 h-9 border-zinc-700"
           >
             <span className="sr-only">{translations["Remove from cart"]}</span>
             <CloseIcon className="w-6 h-6" />
           </button>
         </fetcher.Form>
-        <div className="p-1 px-3 border border-zinc-700 flex-1 h-9">
+        <div className="flex-1 p-1 px-3 border border-zinc-700 h-9">
           <span className="sr-only">
             {translations["Quantity: $1"]?.replace(
               "$1",
-              optimisticQuantity.toString()
+              optimisticQuantity.toFixed(0)
             )}
           </span>
-          <span aria-hidden={true}>{optimisticQuantity}</span>
+          <span aria-hidden={true}>{optimisticQuantity.toFixed(0)}</span>
         </div>
         <fetcher.Form action="/cart" method="post">
           <input type="hidden" name="_action" value={Actions.setQuantity} />
@@ -125,7 +125,7 @@ export function CartListItem({
             type="hidden"
             name="quantity"
             disabled={quantity - 1 <= 0}
-            value={Math.max(0, optimisticQuantity - 1)}
+            value={Math.max(0, optimisticQuantity - 1).toFixed(0)}
           />
           <button
             data-testid="decrement-cart"
@@ -153,11 +153,15 @@ export function CartListItem({
             value={location.pathname + location.search}
           />
           <input type="hidden" value={variantId} name="variantId" />
-          <input type="hidden" name="quantity" value={optimisticQuantity + 1} />
+          <input
+            type="hidden"
+            name="quantity"
+            value={(optimisticQuantity + 1).toFixed(0)}
+          />
           <button
             data-testid="increment-cart"
             type="submit"
-            className="w-9 h-9 flex items-center justify-center border border-zinc-700 border-l-0"
+            className="flex items-center justify-center border border-l-0 w-9 h-9 border-zinc-700"
           >
             <span className="sr-only">{translations["Add item"]}</span>
             <PlusIcon className="w-6 h-6" />

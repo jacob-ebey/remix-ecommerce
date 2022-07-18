@@ -1,7 +1,7 @@
-import { Fragment } from "react";
+import { Fragment, useMemo } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 
-import { FullWishlistItem } from "~/models/ecommerce-provider.server";
+import type { FullWishlistItem } from "~/models/ecommerce-provider.server";
 import { PickTranslations } from "~/translations.server";
 
 import { CloseIcon, WishlistIcon } from "./icons";
@@ -10,13 +10,11 @@ import { WishlistListItem } from "./wishlist-listitem";
 
 export function WishlistPopover({
   wishlist,
-  wishlistCount,
   open,
   onClose,
   translations,
 }: {
-  wishlist?: FullWishlistItem[];
-  wishlistCount?: number;
+  wishlist?: FullWishlistItem[] | null;
   open: boolean;
   onClose: () => void;
   translations: PickTranslations<
@@ -30,10 +28,15 @@ export function WishlistPopover({
     | "Move to cart"
   >;
 }) {
+  let wishlistCount = useMemo(
+    () => wishlist?.reduce((acc, item) => acc + item.quantity, 0),
+    [wishlist]
+  );
+
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog as="div" className="fixed inset-0 z-10" onClose={onClose}>
-        <div className="min-h-screen w-full relative">
+        <div className="relative w-full min-h-screen">
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -58,7 +61,7 @@ export function WishlistPopover({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed top-0 right-0 bottom-0 w-full max-w-md overflow-hidden text-left align-middle transition-all transform bg-zinc-900 shadow-xl flex flex-col">
+            <div className="fixed top-0 bottom-0 right-0 flex flex-col w-full max-w-md overflow-hidden text-left align-middle transition-all transform shadow-xl bg-zinc-900">
               <div className="flex justify-between p-4 lg:px-6">
                 <button
                   data-testid="close-wishlist"
@@ -82,8 +85,8 @@ export function WishlistPopover({
               </div>
               <div className="flex flex-col flex-1 overflow-y-auto">
                 {!wishlist ? (
-                  <div className="h-full flex flex-col justify-center items-center p-4 lg:px-6">
-                    <span className="border border-dashed border-primary rounded-full flex items-center justify-center w-24 h-24 bg-secondary text-secondary">
+                  <div className="flex flex-col items-center justify-center h-full p-4 lg:px-6">
+                    <span className="flex items-center justify-center w-24 h-24 border border-dashed rounded-full border-primary bg-secondary text-secondary">
                       <WishlistIcon className="block w-8 h-8" />
                     </span>
                     <Dialog.Title
@@ -98,7 +101,7 @@ export function WishlistPopover({
                     <div className="flex-1 px-4 lg:px-6">
                       <Dialog.Title
                         as="h1"
-                        className="text-2xl font-semibold mb-6"
+                        className="mb-6 text-2xl font-semibold"
                       >
                         {translations.Wishlist}
                       </Dialog.Title>

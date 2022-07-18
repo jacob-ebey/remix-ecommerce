@@ -1,9 +1,11 @@
 import { Suspense, lazy, useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import type { MetaFunction } from "@remix-run/node";
-import { LinksFunction } from "@remix-run/node";
-import type { ShouldReloadFunction } from "@remix-run/react";
-import type { UseDataFunctionReturn } from "@remix-run/react/dist/components";
+import type { LinksFunction, MetaFunction } from "@remix-run/node";
+import { Deferred } from "@remix-run/react";
+import type {
+  ShouldReloadFunction,
+  UseDataFunctionReturn,
+} from "@remix-run/react";
 
 import {
   Links,
@@ -12,7 +14,6 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useLoaderData,
   useMatches,
 } from "@remix-run/react";
 
@@ -59,18 +60,25 @@ export let links: LinksFunction = () => {
   ];
 };
 
-export function Document({ children }: { children: ReactNode }) {
+function Layout({
+  cart,
+  wishlist,
+  children,
+}: {
+  children?: ReactNode;
+  cart?: UseDataFunctionReturn<typeof loader>["cart"];
+  wishlist?: UseDataFunctionReturn<typeof loader>["wishlist"];
+}) {
   let matches = useMatches();
   let rootMatch = matches.find((match) => match.id === "root");
   let loaderData = rootMatch?.data as
     | UseDataFunctionReturn<typeof loader>
     | undefined;
 
-  let { cart, categories, lang, pages, translations, wishlist } =
-    loaderData || {
-      lang: "en",
-      pages: [],
-    };
+  let { categories, lang, pages, translations } = loaderData || {
+    lang: "en",
+    pages: [],
+  };
 
   let allCategories = useMemo(() => {
     let results: NavbarCategory[] = translations
@@ -91,15 +99,116 @@ export function Document({ children }: { children: ReactNode }) {
   let [cartOpen, setCartOpen] = useState(false);
   let [wishlistOpen, setWishlistOpen] = useState(false);
 
-  let cartCount = useMemo(
-    () => cart?.items?.reduce((sum, item) => sum + item.quantity, 0),
-    [cart]
-  );
+  return (
+    <>
+      <Deferred
+        value={cart}
+        fallbackElement={
+          <Navbar
+            lang={lang}
+            logoHref={logoHref}
+            storeName={translations?.["Store Name"]}
+            categories={allCategories}
+            translations={translations}
+            onOpenCart={() => setCartOpen(true)}
+            onOpenWishlist={() => setWishlistOpen(true)}
+          />
+        }
+      >
+        {(cart) => (
+          <Deferred
+            value={wishlist}
+            fallbackElement={
+              <Navbar
+                cart={cart}
+                lang={lang}
+                logoHref={logoHref}
+                storeName={translations?.["Store Name"]}
+                categories={allCategories}
+                translations={translations}
+                onOpenCart={() => setCartOpen(true)}
+                onOpenWishlist={() => setWishlistOpen(true)}
+              />
+            }
+          >
+            {(wishlist) => (
+              <Navbar
+                cart={cart}
+                wishlist={wishlist}
+                lang={lang}
+                logoHref={logoHref}
+                storeName={translations?.["Store Name"]}
+                categories={allCategories}
+                translations={translations}
+                onOpenCart={() => setCartOpen(true)}
+                onOpenWishlist={() => setWishlistOpen(true)}
+              />
+            )}
+          </Deferred>
+        )}
+      </Deferred>
+      <div className="flex-1">{children}</div>
+      <Footer
+        lang={lang}
+        logoHref={logoHref}
+        pages={pages}
+        storeName={translations?.["Store Name"]}
+      />
 
-  let wishlistCount = useMemo(
-    () => wishlist?.reduce((sum, item) => sum + item.quantity, 0),
-    [wishlist]
+      {translations ? (
+        <ClientOnly>
+          <Suspense fallback="">
+            <LanguageDialog lang={lang} translations={translations} />
+          </Suspense>
+        </ClientOnly>
+      ) : null}
+
+      {translations ? (
+        <Deferred value={wishlist}>
+          {(wishlist) => (
+            <ClientOnly>
+              <WishlistPopover
+                wishlist={wishlist}
+                open={wishlistOpen}
+                translations={translations!}
+                onClose={() => setWishlistOpen(false)}
+              />
+            </ClientOnly>
+          )}
+        </Deferred>
+      ) : null}
+
+      {translations ? (
+        <Deferred value={cart}>
+          {(cart) => (
+            <ClientOnly>
+              <CartPopover
+                cart={cart}
+                open={cartOpen}
+                translations={translations!}
+                onClose={() => setCartOpen(false)}
+              />
+            </ClientOnly>
+          )}
+        </Deferred>
+      ) : null}
+    </>
   );
+}
+
+function Document({ children }: { children: ReactNode }) {
+  let matches = useMatches();
+  let rootMatch = matches.find((match) => match.id === "root");
+  let loaderData = rootMatch?.data as
+    | UseDataFunctionReturn<typeof loader>
+    | undefined;
+
+  let { cart, lang, wishlist } = loaderData || {
+    lang: "en",
+    pages: [],
+  };
+
+  console.log({ wishlist });
 
   return (
     <html lang={lang} className="text-gray-100 bg-zinc-900">
@@ -110,60 +219,9 @@ export function Document({ children }: { children: ReactNode }) {
         <Links />
       </head>
       <body className="flex flex-col min-h-screen">
-        <Navbar
-          cartCount={cartCount}
-          wishlistCount={wishlistCount}
-          lang={lang}
-          logoHref={logoHref}
-          storeName={translations?.["Store Name"]}
-          categories={allCategories}
-          translations={translations}
-          onOpenCart={() => setCartOpen(true)}
-          onOpenWishlist={() => setWishlistOpen(true)}
-        />
-        <div className="flex-1">{children}</div>
-        <Footer
-          lang={lang}
-          logoHref={logoHref}
-          pages={pages}
-          storeName={translations?.["Store Name"]}
-        />
-
-        {translations ? (
-          <ClientOnly>
-            <Suspense fallback="">
-              <LanguageDialog lang={lang} translations={translations} />
-            </Suspense>
-          </ClientOnly>
-        ) : null}
-
-        {translations ? (
-          <ClientOnly>
-            <Suspense fallback="">
-              <WishlistPopover
-                wishlistCount={wishlistCount}
-                wishlist={wishlist}
-                open={wishlistOpen}
-                translations={translations}
-                onClose={() => setWishlistOpen(false)}
-              />
-            </Suspense>
-          </ClientOnly>
-        ) : null}
-
-        {translations ? (
-          <ClientOnly>
-            <Suspense fallback="">
-              <CartPopover
-                cartCount={cartCount}
-                cart={cart}
-                open={cartOpen}
-                translations={translations}
-                onClose={() => setCartOpen(false)}
-              />
-            </Suspense>
-          </ClientOnly>
-        ) : null}
+        <Layout cart={cart} wishlist={wishlist}>
+          {children}
+        </Layout>
 
         <ScrollRestoration />
         <Scripts />

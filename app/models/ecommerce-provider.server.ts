@@ -87,7 +87,7 @@ export interface EcommerceProvider {
   getCartInfo(
     locale: Language,
     items: CartItem[]
-  ): Promise<CartInfo | undefined>;
+  ): Promise<CartInfo | null>;
   getCategories(
     language: Language,
     count: number,
@@ -95,13 +95,13 @@ export interface EcommerceProvider {
   ): Promise<Category[]>;
   getCheckoutUrl(language: Language, items: CartItem[]): Promise<string>;
   getFeaturedProducts(language: Language): Promise<Product[]>;
-  getPage(language: Language, slug: string): Promise<FullPage | undefined>;
+  getPage(language: Language, slug: string): Promise<FullPage | null>;
   getPages(language: Language): Promise<Page[]>;
   getProduct(
     language: Language,
     slug: string,
     selectedOptions?: SelectedProductOption[]
-  ): Promise<FullProduct | undefined>;
+  ): Promise<FullProduct | null>;
   getProducts(
     language: Language,
     category?: string,
@@ -115,5 +115,5 @@ export interface EcommerceProvider {
   getWishlistInfo(
     locale: Language,
     items: WishlistItem[]
-  ): Promise<FullWishlistItem[] | undefined>;
+  ): Promise<FullWishlistItem[] | null>;
 }

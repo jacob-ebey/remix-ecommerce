@@ -1,8 +1,8 @@
-import { Fragment } from "react";
+import { Fragment, useMemo } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 
-import { CartInfo } from "~/models/ecommerce-provider.server";
-import { PickTranslations } from "~/translations.server";
+import type { CartInfo } from "~/models/ecommerce-provider.server";
+import type { PickTranslations } from "~/translations.server";
 
 import { CartIcon, CloseIcon } from "./icons";
 
@@ -11,13 +11,11 @@ import { CheckoutForm } from "./checkout-form";
 
 export function CartPopover({
   cart,
-  cartCount,
   open,
   onClose,
   translations,
 }: {
-  cart?: CartInfo;
-  cartCount?: number;
+  cart?: CartInfo | null;
   open: boolean;
   onClose: () => void;
   translations: PickTranslations<
@@ -35,10 +33,15 @@ export function CartPopover({
     | "Shipping"
   >;
 }) {
+  let cartCount = useMemo(
+    () => cart?.items?.reduce((acc, item) => acc + item.quantity, 0),
+    [cart]
+  );
+
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog as="div" className="fixed inset-0 z-10" onClose={onClose}>
-        <div className="min-h-screen w-full relative">
+        <div className="relative w-full min-h-screen">
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -63,7 +66,7 @@ export function CartPopover({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed top-0 right-0 bottom-0 w-full max-w-md overflow-hidden text-left align-middle transition-all transform bg-zinc-900 shadow-xl flex flex-col">
+            <div className="fixed top-0 bottom-0 right-0 flex flex-col w-full max-w-md overflow-hidden text-left align-middle transition-all transform shadow-xl bg-zinc-900">
               <div className="flex justify-between p-4 lg:px-6">
                 <button
                   className="relative flex items-center hover:text-gray-300"
@@ -86,8 +89,8 @@ export function CartPopover({
               </div>
               <div className="flex flex-col flex-1 overflow-y-auto">
                 {!cart?.items ? (
-                  <div className="h-full flex flex-col justify-center items-center p-4 lg:px-6">
-                    <span className="border border-dashed border-primary rounded-full flex items-center justify-center w-24 h-24 bg-secondary text-secondary">
+                  <div className="flex flex-col items-center justify-center h-full p-4 lg:px-6">
+                    <span className="flex items-center justify-center w-24 h-24 border border-dashed rounded-full border-primary bg-secondary text-secondary">
                       <CartIcon className="block w-8 h-8" />
                     </span>
                     <Dialog.Title
@@ -102,7 +105,7 @@ export function CartPopover({
                     <div className="flex-1 px-4 lg:px-6">
                       <Dialog.Title
                         as="h1"
-                        className="text-2xl font-semibold mb-6"
+                        className="mb-6 text-2xl font-semibold"
                       >
                         {translations.Cart}
                       </Dialog.Title>
@@ -122,7 +125,7 @@ export function CartPopover({
                       </ul>
                     </div>
                     <CheckoutForm
-                      className="sticky bottom-0 border-t border-zinc-700 py-4 mx-4 lg:mx-6 pt-4 bg-zinc-900"
+                      className="sticky bottom-0 py-4 pt-4 mx-4 border-t border-zinc-700 lg:mx-6 bg-zinc-900"
                       cart={cart}
                       translations={translations}
                     />

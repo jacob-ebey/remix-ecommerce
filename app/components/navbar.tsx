@@ -1,9 +1,13 @@
-import { Fragment, lazy, Suspense, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { Form, Link, PrefetchPageLinks } from "@remix-run/react";
 import type { To } from "react-router-dom";
 import { Popover, Transition } from "@headlessui/react";
 
 import type { PickTranslations } from "~/translations.server";
+import type {
+  CartInfo,
+  FullWishlistItem,
+} from "~/models/ecommerce-provider.server";
 import type { Language } from "~/models/language";
 
 import { CartIcon, CloseIcon, MenuIcon, WishlistIcon } from "./icons";
@@ -22,11 +26,11 @@ export function Navbar({
   storeName,
   categories,
   translations,
-  cartCount,
-  wishlistCount,
+  cart,
+  wishlist,
 }: {
-  cartCount?: number;
-  wishlistCount?: number;
+  cart?: CartInfo | null;
+  wishlist?: FullWishlistItem[] | null;
   onOpenCart: () => void;
   onOpenWishlist: () => void;
   lang: Language;
@@ -44,8 +48,17 @@ export function Navbar({
 }) {
   let [prefetchQuery, setPrefetchSeachQuery] = useState("");
 
+  let cartCount = useMemo(
+    () => cart?.items?.reduce((acc, item) => acc + item.quantity, 0),
+    [cart]
+  );
+  let wishlistCount = useMemo(
+    () => wishlist?.reduce((acc, item) => acc + item.quantity, 0),
+    [wishlist]
+  );
+
   return (
-    <nav className="p-4 lg:px-6 border-b border-zinc-700">
+    <nav className="p-4 border-b lg:px-6 border-zinc-700">
       <div className="flex">
         <div className="flex items-center flex-1">
           <Link prefetch="intent" to={`/${lang}`}>
@@ -79,7 +92,7 @@ export function Navbar({
             )}
           </Link>
           {storeName ? <h1 className="sr-only">{storeName}</h1> : null}
-          <ul className="hidden mx-4 lg:flex items-center overflow-x-auto">
+          <ul className="items-center hidden mx-4 overflow-x-auto lg:flex">
             {categories.map((category, i) => (
               <li key={category.name + "|" + i} className="mx-2">
                 <Link
@@ -95,12 +108,12 @@ export function Navbar({
           <Form
             data-testid="search-form"
             action={`/${lang}/search`}
-            className="flex-1 max-w-lg mx-auto hidden lg:block"
+            className="flex-1 hidden max-w-lg mx-auto lg:block"
           >
             <input
               data-testid="search-input"
               name="q"
-              className=" p-2 bg-zinc-900 border border-zinc-700 w-full"
+              className="w-full p-2 border bg-zinc-900 border-zinc-700"
               placeholder={translations?.["Search for products..."]}
               onChange={(e) => setPrefetchSeachQuery(e.target.value)}
             />
@@ -114,7 +127,7 @@ export function Navbar({
             data-testid="cart-link"
             prefetch="intent"
             to={`/${lang}/cart`}
-            className="group relative inline-block hover:text-gray-300 ml-4"
+            className="relative inline-block ml-4 group hover:text-gray-300"
             onClick={(event) => {
               event.preventDefault();
               onOpenCart();
@@ -138,7 +151,7 @@ export function Navbar({
             data-testid="wishlist-link"
             prefetch="intent"
             to={`/${lang}/wishlist`}
-            className="group relative hover:text-gray-300 ml-4"
+            className="relative ml-4 group hover:text-gray-300"
             onClick={(event) => {
               event.preventDefault();
               onOpenWishlist();
@@ -148,7 +161,7 @@ export function Navbar({
               {translations ? translations["Wishlist"] : null}
             </span>
             <WishlistIcon className="w-8 h-8" />
-            {!!wishlistCount && (
+            {!!wishlist?.length && (
               <span
                 data-testid="wishlist-count"
                 style={{ lineHeight: "0.75rem" }}
@@ -158,7 +171,7 @@ export function Navbar({
               </span>
             )}
           </Link>
-          <Popover className="lg:hidden relative flex items-center ml-4">
+          <Popover className="relative flex items-center ml-4 lg:hidden">
             {({ close }) => (
               <>
                 <Popover.Button className="hover:text-gray-300">
@@ -177,7 +190,7 @@ export function Navbar({
                   leaveTo="opacity-0"
                 >
                   <Popover.Panel
-                    className="fixed z-10 top-0 left-0 bottom-0 right-0 bg-zinc-900 p-4"
+                    className="fixed top-0 bottom-0 left-0 right-0 z-10 p-4 bg-zinc-900"
                     focus
                   >
                     <div className="flex">
@@ -225,12 +238,12 @@ export function Navbar({
       <Form
         data-testid="mobile-search-form"
         action={`/${lang}/search`}
-        className="lg:hidden mt-3"
+        className="mt-3 lg:hidden"
       >
         <input
           data-testid="mobile-search-input"
           name="q"
-          className="bg-zinc-900 border border-zinc-700 w-full p-2"
+          className="w-full p-2 border bg-zinc-900 border-zinc-700"
           placeholder={translations?.["Search for products..."]}
         />
       </Form>
