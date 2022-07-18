@@ -8,7 +8,7 @@ processes = []
 
 [deploy]
 # release_command = "npx -y prisma migrate deploy"
-strategy = "bluegreen"
+strategy = "rolling"
 
 [env]
 NODE_ENV = "production"
