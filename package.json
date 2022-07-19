@@ -20,9 +20,9 @@
   },
   "dependencies": {
     "@headlessui/react": "^1.4.2",
-    "@remix-run/node": "0.0.0-experimental-24bf73f51",
-    "@remix-run/react": "0.0.0-experimental-24bf73f51",
-    "@remix-run/serve": "0.0.0-experimental-24bf73f51",
+    "@remix-run/node": "0.0.0-experimental-e2ccb0faf",
+    "@remix-run/react": "0.0.0-experimental-e2ccb0faf",
+    "@remix-run/serve": "0.0.0-experimental-e2ccb0faf",
     "@shopify/shopify-api": "^2.0.0",
     "classnames": "^2.3.1",
     "decimal.js": "^10.3.1",
@@ -33,7 +33,7 @@
     "sharp": "^0.29.3"
   },
   "devDependencies": {
-    "@remix-run/dev": "0.0.0-experimental-24bf73f51",
+    "@remix-run/dev": "0.0.0-experimental-e2ccb0faf",
     "@tailwindcss/typography": "^0.5.0",
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",

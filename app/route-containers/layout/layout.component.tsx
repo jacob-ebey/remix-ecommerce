@@ -20,6 +20,7 @@ import {
 import { ClientOnly } from "~/components/client-only";
 import { Footer } from "~/components/footer";
 import { Navbar, NavbarCategory } from "~/components/navbar";
+import { multipleDeferred } from "~/utils/deferred";
 
 import logoHref from "~/images/remix-glow.svg";
 import globalStylesheetHref from "~/styles/global.css";
@@ -101,52 +102,33 @@ function Layout({
 
   return (
     <>
-      <Deferred
-        value={cart}
-        fallbackElement={
+      <Suspense
+        fallback={
           <Navbar
             lang={lang}
             logoHref={logoHref}
             storeName={translations?.["Store Name"]}
             categories={allCategories}
             translations={translations}
-            onOpenCart={() => setCartOpen(true)}
-            onOpenWishlist={() => setWishlistOpen(true)}
           />
         }
       >
-        {(cart) => (
-          <Deferred
-            value={wishlist}
-            fallbackElement={
-              <Navbar
-                cart={cart}
-                lang={lang}
-                logoHref={logoHref}
-                storeName={translations?.["Store Name"]}
-                categories={allCategories}
-                translations={translations}
-                onOpenCart={() => setCartOpen(true)}
-                onOpenWishlist={() => setWishlistOpen(true)}
-              />
-            }
-          >
-            {(wishlist) => (
-              <Navbar
-                cart={cart}
-                wishlist={wishlist}
-                lang={lang}
-                logoHref={logoHref}
-                storeName={translations?.["Store Name"]}
-                categories={allCategories}
-                translations={translations}
-                onOpenCart={() => setCartOpen(true)}
-                onOpenWishlist={() => setWishlistOpen(true)}
-              />
-            )}
-          </Deferred>
-        )}
-      </Deferred>
+        <Deferred value={multipleDeferred({ cart, wishlist })}>
+          {({ cart, wishlist }) => (
+            <Navbar
+              cart={cart}
+              wishlist={wishlist}
+              lang={lang}
+              logoHref={logoHref}
+              storeName={translations?.["Store Name"]}
+              categories={allCategories}
+              translations={translations}
+              onOpenCart={() => setCartOpen(true)}
+              onOpenWishlist={() => setWishlistOpen(true)}
+            />
+          )}
+        </Deferred>
+      </Suspense>
       <div className="flex-1">{children}</div>
       <Footer
         lang={lang}
@@ -157,40 +139,44 @@ function Layout({
 
       {translations ? (
         <ClientOnly>
-          <Suspense fallback="">
+          <Suspense>
             <LanguageDialog lang={lang} translations={translations} />
           </Suspense>
         </ClientOnly>
       ) : null}
 
       {translations ? (
-        <Deferred value={wishlist}>
-          {(wishlist) => (
-            <ClientOnly>
-              <WishlistPopover
-                wishlist={wishlist}
-                open={wishlistOpen}
-                translations={translations!}
-                onClose={() => setWishlistOpen(false)}
-              />
-            </ClientOnly>
-          )}
-        </Deferred>
+        <Suspense>
+          <Deferred value={wishlist}>
+            {(wishlist) => (
+              <ClientOnly>
+                <WishlistPopover
+                  wishlist={wishlist}
+                  open={wishlistOpen}
+                  translations={translations!}
+                  onClose={() => setWishlistOpen(false)}
+                />
+              </ClientOnly>
+            )}
+          </Deferred>
+        </Suspense>
       ) : null}
 
       {translations ? (
-        <Deferred value={cart}>
-          {(cart) => (
-            <ClientOnly>
-              <CartPopover
-                cart={cart}
-                open={cartOpen}
-                translations={translations!}
-                onClose={() => setCartOpen(false)}
-              />
-            </ClientOnly>
-          )}
-        </Deferred>
+        <Suspense>
+          <Deferred value={cart}>
+            {(cart) => (
+              <ClientOnly>
+                <CartPopover
+                  cart={cart}
+                  open={cartOpen}
+                  translations={translations!}
+                  onClose={() => setCartOpen(false)}
+                />
+              </ClientOnly>
+            )}
+          </Deferred>
+        </Suspense>
       ) : null}
     </>
   );

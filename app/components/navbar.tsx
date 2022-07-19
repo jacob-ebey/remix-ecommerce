@@ -31,8 +31,8 @@ export function Navbar({
 }: {
   cart?: CartInfo | null;
   wishlist?: FullWishlistItem[] | null;
-  onOpenCart: () => void;
-  onOpenWishlist: () => void;
+  onOpenCart?: () => void;
+  onOpenWishlist?: () => void;
   lang: Language;
   logoHref: string;
   storeName?: string;
@@ -125,12 +125,13 @@ export function Navbar({
         <div className="flex items-center">
           <Link
             data-testid="cart-link"
-            prefetch="intent"
             to={`/${lang}/cart`}
             className="relative inline-block ml-4 group hover:text-gray-300"
             onClick={(event) => {
-              event.preventDefault();
-              onOpenCart();
+              if (onOpenCart) {
+                event.preventDefault();
+                onOpenCart();
+              }
             }}
           >
             {translations ? (
@@ -149,12 +150,13 @@ export function Navbar({
           </Link>
           <Link
             data-testid="wishlist-link"
-            prefetch="intent"
             to={`/${lang}/wishlist`}
             className="relative ml-4 group hover:text-gray-300"
             onClick={(event) => {
-              event.preventDefault();
-              onOpenWishlist();
+              if (onOpenWishlist) {
+                event.preventDefault();
+                onOpenWishlist();
+              }
             }}
           >
             <span className="sr-only">
