@@ -119,47 +119,47 @@ function Layout({
         storeName={translations?.["Store Name"]}
       />
 
-      {translations ? (
-        <ClientOnly>
+      <ClientOnly>
+        {translations ? (
           <Suspense>
             <LanguageDialog lang={lang} translations={translations} />
           </Suspense>
-        </ClientOnly>
-      ) : null}
+        ) : null}
+      </ClientOnly>
 
-      {translations ? (
-        <Suspense>
-          <Await resolve={wishlist}>
-            {(wishlist) => (
-              <ClientOnly>
+      <ClientOnly>
+        {translations ? (
+          <Suspense>
+            <Await resolve={wishlist}>
+              {(wishlist) => (
                 <WishlistPopover
                   wishlist={wishlist}
                   open={wishlistOpen}
                   translations={translations!}
                   onClose={() => setWishlistOpen(false)}
                 />
-              </ClientOnly>
-            )}
-          </Await>
-        </Suspense>
-      ) : null}
+              )}
+            </Await>
+          </Suspense>
+        ) : null}
+      </ClientOnly>
 
-      {translations ? (
-        <Suspense>
-          <Await resolve={cart}>
-            {(cart) => (
-              <ClientOnly>
+      <ClientOnly>
+        {translations ? (
+          <Suspense>
+            <Await resolve={cart}>
+              {(cart) => (
                 <CartPopover
                   cart={cart}
                   open={cartOpen}
                   translations={translations!}
                   onClose={() => setCartOpen(false)}
                 />
-              </ClientOnly>
-            )}
-          </Await>
-        </Suspense>
-      ) : null}
+              )}
+            </Await>
+          </Suspense>
+        ) : null}
+      </ClientOnly>
     </>
   );
 }
