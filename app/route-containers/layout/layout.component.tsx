@@ -1,13 +1,12 @@
 import { Suspense, lazy, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import type { LinksFunction, MetaFunction } from "@remix-run/node";
-import { Deferred } from "@remix-run/react";
 import type {
   ShouldReloadFunction,
   UseDataFunctionReturn,
 } from "@remix-run/react";
-
 import {
+  Await,
   Links,
   LiveReload,
   Meta,
@@ -20,7 +19,6 @@ import {
 import { ClientOnly } from "~/components/client-only";
 import { Footer } from "~/components/footer";
 import { Navbar, NavbarCategory } from "~/components/navbar";
-import { multipleDeferred } from "~/utils/deferred";
 
 import logoHref from "~/images/remix-glow.svg";
 import globalStylesheetHref from "~/styles/global.css";
@@ -102,33 +100,17 @@ function Layout({
 
   return (
     <>
-      <Suspense
-        fallback={
-          <Navbar
-            lang={lang}
-            logoHref={logoHref}
-            storeName={translations?.["Store Name"]}
-            categories={allCategories}
-            translations={translations}
-          />
-        }
-      >
-        <Deferred value={multipleDeferred({ cart, wishlist })}>
-          {({ cart, wishlist }) => (
-            <Navbar
-              cart={cart}
-              wishlist={wishlist}
-              lang={lang}
-              logoHref={logoHref}
-              storeName={translations?.["Store Name"]}
-              categories={allCategories}
-              translations={translations}
-              onOpenCart={() => setCartOpen(true)}
-              onOpenWishlist={() => setWishlistOpen(true)}
-            />
-          )}
-        </Deferred>
-      </Suspense>
+      <Navbar
+        cart={cart}
+        wishlist={wishlist}
+        lang={lang}
+        logoHref={logoHref}
+        storeName={translations?.["Store Name"]}
+        categories={allCategories}
+        translations={translations}
+        onOpenCart={() => setCartOpen(true)}
+        onOpenWishlist={() => setWishlistOpen(true)}
+      />
       <div className="flex-1">{children}</div>
       <Footer
         lang={lang}
@@ -147,7 +129,7 @@ function Layout({
 
       {translations ? (
         <Suspense>
-          <Deferred value={wishlist}>
+          <Await resolve={wishlist}>
             {(wishlist) => (
               <ClientOnly>
                 <WishlistPopover
@@ -158,13 +140,13 @@ function Layout({
                 />
               </ClientOnly>
             )}
-          </Deferred>
+          </Await>
         </Suspense>
       ) : null}
 
       {translations ? (
         <Suspense>
-          <Deferred value={cart}>
+          <Await resolve={cart}>
             {(cart) => (
               <ClientOnly>
                 <CartPopover
@@ -175,7 +157,7 @@ function Layout({
                 />
               </ClientOnly>
             )}
-          </Deferred>
+          </Await>
         </Suspense>
       ) : null}
     </>

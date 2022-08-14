@@ -1,11 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import type { MouseEventHandler } from "react";
-import { Form, useLocation, useSearchParams, useTransition } from "@remix-run/react";
+import {
+  Form,
+  useLocation,
+  useSearchParams,
+  useTransition,
+} from "@remix-run/react";
 import cn from "classnames";
 
 import type { FullProduct } from "~/models/ecommerce-provider.server";
 import { OptimizedImage } from "./optimized-image";
 import { PickTranslations } from "~/translations.server";
+import { useNoFlash } from "~/utils/use-no-flash";
 
 export function ProductDetails({
   product,
@@ -16,11 +22,18 @@ export function ProductDetails({
     "Add to cart" | "Sold out" | "Added!" | "Adding"
   >;
 }) {
+  let transition = useTransition();
   let location = useLocation();
-  let [searchParams] = useSearchParams();
-  searchParams.sort();
+  let [currentSearchParams] = useSearchParams();
+  let searchParams =
+    transition.type === "loaderSubmission" && transition.submission?.formData
+      ? (transition.submission.formData as URLSearchParams)
+      : currentSearchParams;
 
-  let disabled = !product.selectedVariantId || !product.availableForSale;
+  let disabled =
+    !product.selectedVariantId ||
+    !product.availableForSale ||
+    transition.state !== "idle";
 
   return (
     <main>
@@ -41,39 +54,44 @@ export function ProductDetails({
               <p className="leading-relaxed">{product.description}</p>
             ) : null}
             {product.options && product.options.length > 0 ? (
-              <Form replace>
-                {Array.from(searchParams.entries()).map(([key, value]) => (
-                  <input
-                    key={key + value}
-                    type="hidden"
-                    name={key}
-                    defaultValue={value}
-                  />
-                ))}
+              <>
                 {product.options.map((option) => (
                   <div key={option.name} className="mt-6">
-                    <h2 className="font-semibold">{option.name}</h2>
-                    <ul className="mt-2" data-testid="product-option">
-                      {option.values.map((value) => (
-                        <li key={value} className="inline-block mr-2">
-                          <button
-                            aria-selected={
-                              searchParams.get(option.name) === value
-                            }
-                            className={cn(
-                              "px-4 py-2 border rounded hover:text-gray-300",
-                              searchParams.get(option.name) === value
-                                ? "border-gray-50"
-                                : "border-zinc-700"
-                            )}
-                            name={option.name}
-                            value={value}
-                          >
-                            {value}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
+                    <Form replace action={location.pathname}>
+                      {Array.from(searchParams.entries()).map(([key, value]) =>
+                        key === option.name ? null : (
+                          <input
+                            key={key + value}
+                            type="hidden"
+                            name={key}
+                            defaultValue={value}
+                          />
+                        )
+                      )}
+                      <h2 className="font-semibold">{option.name}</h2>
+                      <ul className="mt-2" data-testid="product-option">
+                        {option.values.map((value) => (
+                          <li key={value} className="inline-block mr-2">
+                            <button
+                              aria-selected={
+                                searchParams.get(option.name) === value
+                              }
+                              className={cn(
+                                "px-4 py-2 border rounded hover:text-gray-300",
+                                searchParams.get(option.name) === value
+                                  ? "border-gray-50"
+                                  : "border-zinc-700"
+                              )}
+                              name={option.name}
+                              value={value}
+                              type="submit"
+                            >
+                              {value}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </Form>
                   </div>
                 ))}
                 {!!product.selectedVariantId && !product.availableForSale ? (
@@ -81,7 +99,7 @@ export function ProductDetails({
                     {translations["Sold out"]}
                   </p>
                 ) : null}
-              </Form>
+              </>
             ) : null}
             <Form replace method="post" className="mt-8">
               <input
@@ -105,7 +123,9 @@ export function ProductDetails({
                 data-testid="add-to-cart"
                 className={cn(
                   "py-4 text-gray-900 active:bg-gray-300 block w-full text-center font-semibold uppercase",
-                  disabled ? "bg-gray-300" : "bg-gray-50"
+                  useNoFlash(disabled, { delay: 0, showFor: 200 })
+                    ? "bg-gray-300"
+                    : "bg-gray-50"
                 )}
                 disabled={disabled}
               >

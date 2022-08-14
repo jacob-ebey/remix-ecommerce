@@ -1,5 +1,5 @@
 import type { LoaderArgs } from "@remix-run/node";
-import { deferred } from "@remix-run/node";
+import { defer } from "@remix-run/node";
 
 import commerce from "~/commerce.server";
 import { getSession } from "~/session.server";
@@ -48,7 +48,7 @@ export async function loader({ request, params }: LoaderArgs) {
     "Move to cart",
   ]);
 
-  return deferred({
+  return defer({
     cart,
     lang,
     pages: [
