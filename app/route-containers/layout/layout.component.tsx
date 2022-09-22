@@ -213,8 +213,12 @@ export function ErrorBoundary({ error }: { error: Error }) {
   );
 }
 
-export let unstable_shouldReload: ShouldReloadFunction = ({ url }) => {
-  return !url.pathname.startsWith("/search");
+export let unstable_shouldReload: ShouldReloadFunction = ({ submission }) => {
+  // only reload if a mutation happened
+  if (submission && submission.method === "POST") {
+    return true;
+  }
+  return false;
 };
 
 export default function Root() {

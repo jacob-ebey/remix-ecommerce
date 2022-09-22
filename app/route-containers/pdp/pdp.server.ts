@@ -20,6 +20,10 @@ export async function action({ request, params }: ActionArgs) {
     formData.get("redirect"),
     `/product/${params.slug}`
   );
+
+  // FIXME: If we could derive the variantId from the selected variants here,
+  // then we wouldn't need to load anything when the user clicks between
+  // variants
   let variantId = formData.get("variantId");
   if (!variantId) {
     return redirect(redirectTo);

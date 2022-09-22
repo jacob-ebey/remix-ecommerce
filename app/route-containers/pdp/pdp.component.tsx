@@ -5,8 +5,10 @@ import { ProductDetails } from "~/components/product-details";
 
 import type { loader } from "./pdp.server";
 
+// FIXME: optimize this when we know how to derive the variantId in the "add to
+// cart action" so we don't need to make a request on search param changes only
 export let unstable_shouldReload: ShouldReloadFunction = ({ prevUrl, url }) => {
-  return prevUrl.toString() !== url.toString();
+  return true;
 };
 
 export const meta = ({ data }: { data: any }) => {
