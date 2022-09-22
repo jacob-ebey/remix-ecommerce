@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import type { MouseEventHandler } from "react";
 import {
   Form,
+  Link,
+  LinkProps,
   useLocation,
   useSearchParams,
   useTransition,
@@ -25,10 +27,10 @@ export function ProductDetails({
   let transition = useTransition();
   let location = useLocation();
   let [currentSearchParams] = useSearchParams();
-  let searchParams =
-    transition.type === "loaderSubmission" && transition.submission?.formData
-      ? (transition.submission.formData as URLSearchParams)
-      : currentSearchParams;
+
+  let searchParams = transition.location
+    ? new URLSearchParams(transition.location.search)
+    : currentSearchParams;
 
   let disabled =
     !product.selectedVariantId ||
@@ -57,41 +59,37 @@ export function ProductDetails({
               <>
                 {product.options.map((option) => (
                   <div key={option.name} className="mt-6">
-                    <Form replace action={location.pathname}>
-                      {Array.from(searchParams.entries()).map(([key, value]) =>
-                        key === option.name ? null : (
-                          <input
-                            key={key + value}
-                            type="hidden"
-                            name={key}
-                            defaultValue={value}
+                    {Array.from(searchParams.entries()).map(([key, value]) =>
+                      key === option.name ? null : (
+                        <input
+                          key={key + value}
+                          type="hidden"
+                          name={key}
+                          defaultValue={value}
+                        />
+                      )
+                    )}
+                    <h2 className="font-semibold">{option.name}</h2>
+                    <ul className="mt-2" data-testid="product-option">
+                      {option.values.map((value) => (
+                        <li key={value} className="inline-block mr-2">
+                          <VariantLink
+                            name={option.name}
+                            value={value}
+                            params={searchParams}
+                            className={cn(
+                              "px-4 py-2 border rounded hover:text-gray-300",
+                              searchParams.get(option.name) === value
+                                ? "border-gray-50"
+                                : "border-zinc-700"
+                            )}
+                            aria-current={
+                              searchParams.get(option.name) === value
+                            }
                           />
-                        )
-                      )}
-                      <h2 className="font-semibold">{option.name}</h2>
-                      <ul className="mt-2" data-testid="product-option">
-                        {option.values.map((value) => (
-                          <li key={value} className="inline-block mr-2">
-                            <button
-                              aria-selected={
-                                searchParams.get(option.name) === value
-                              }
-                              className={cn(
-                                "px-4 py-2 border rounded hover:text-gray-300",
-                                searchParams.get(option.name) === value
-                                  ? "border-gray-50"
-                                  : "border-zinc-700"
-                              )}
-                              name={option.name}
-                              value={value}
-                              type="submit"
-                            >
-                              {value}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    </Form>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 ))}
                 {!!product.selectedVariantId && !product.availableForSale ? (
@@ -252,5 +250,24 @@ function ImageSlider({ images }: { images: string[] }) {
         </ul>
       </div>
     </div>
+  );
+}
+
+function VariantLink({
+  name,
+  value,
+  params,
+  ...props
+}: Omit<LinkProps, "to"> & {
+  name: string;
+  value: string;
+  params: URLSearchParams;
+}) {
+  let clonedParams = new URLSearchParams(params);
+  clonedParams.set(name, value);
+  return (
+    <Link {...props} to={{ pathname: ".", search: clonedParams.toString() }}>
+      {value}
+    </Link>
   );
 }
