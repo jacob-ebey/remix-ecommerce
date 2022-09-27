@@ -266,7 +266,11 @@ function VariantLink({
   let clonedParams = new URLSearchParams(params);
   clonedParams.set(name, value);
   return (
-    <Link {...props} to={{ pathname: ".", search: clonedParams.toString() }}>
+    <Link
+      {...props}
+      prefetch="intent"
+      to={{ pathname: ".", search: clonedParams.toString() }}
+    >
       {value}
     </Link>
   );
