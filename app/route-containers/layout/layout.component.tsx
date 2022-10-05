@@ -213,13 +213,13 @@ export function ErrorBoundary({ error }: { error: Error }) {
   );
 }
 
-export let unstable_shouldReload: ShouldReloadFunction = ({ submission }) => {
-  // only reload if a mutation happened
-  if (submission && submission.method === "POST") {
-    return true;
-  }
-  return false;
-};
+// export let unstable_shouldReload: ShouldReloadFunction = ({ submission }) => {
+//   // only reload if a mutation happened
+//   if (submission && submission.method === "POST") {
+//     return true;
+//   }
+//   return false;
+// };
 
 export default function Root() {
   return (
