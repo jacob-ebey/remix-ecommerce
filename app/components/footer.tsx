@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { Form, Link, useLocation } from "@remix-run/react";
 import type { To } from "react-router-dom";
+import Image from "remix-image";
 import { Popover, Transition } from "@headlessui/react";
 import cn from "classnames";
 
@@ -8,7 +9,6 @@ import { Language } from "~/models/language";
 
 import { MexicoFlag, UnitedStatesFlag } from "./flags";
 import { ChevronUp, GithubIcon } from "./icons";
-import { OptimizedImage } from "./optimized-image";
 
 export type FooterPage = {
   id: string;
@@ -34,7 +34,7 @@ export function Footer({
       <div className="lg:flex border-t border-zinc-700 px-4 lg:px-6 py-16">
         <div className="lg:mr-20 mb-6">
           <div className="flex items-center flex-1">
-            <OptimizedImage
+            <img
               className="w-10 h-10"
               src={logoHref}
               alt=""

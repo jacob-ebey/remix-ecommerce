@@ -2,9 +2,8 @@ import { useMemo } from "react";
 import type { ReactNode } from "react";
 import type { To } from "react-router-dom";
 import { Link } from "@remix-run/react";
+import Image from "remix-image";
 import cn from "classnames";
-
-import { OptimizedImage } from "./optimized-image";
 
 export type ScrollingProductListProduct = {
   id: string;
@@ -32,7 +31,8 @@ function ScrollingProductItem({
         className="group block aspect-square overflow-hidden w-screen max-w-sm"
         tabIndex={disabled ? -1 : undefined}
       >
-        <OptimizedImage
+        <Image
+          unoptimized
           loading="lazy"
           className="object-cover w-full h-full transform transition duration-500 motion-safe:group-focus:scale-105 motion-safe:group-hover:scale-105"
           src={image}

@@ -2,10 +2,10 @@ import type { ReactNode } from "react";
 import { useMemo, useId } from "react";
 import { Link, useFetcher, useLocation } from "@remix-run/react";
 import type { To } from "react-router-dom";
+import Image from "remix-image";
 import cn from "classnames";
 
 import { WishlistIcon } from "./icons";
-import { OptimizedImage } from "./optimized-image";
 import { PickTranslations } from "~/translations.server";
 
 export type ThreeProductGridProduct = {
@@ -49,7 +49,8 @@ function ThreeProductGridItem({
           to={product.to}
           aria-labelledby={id}
         >
-          <OptimizedImage
+          <Image
+            unoptimized
             className="object-cover w-full h-full transition duration-500 transform motion-safe:group-focus:scale-110 motion-safe:group-hover:scale-110"
             src={product.image}
             width={480}
@@ -62,12 +63,14 @@ function ThreeProductGridItem({
                         height: 480,
                         width: 480,
                       },
+                      maxWidth: 600,
                     },
                     {
                       size: {
                         height: 767,
                         width: 767,
                       },
+                      maxWidth: 900,
                     },
                     {
                       size: {
@@ -82,6 +85,7 @@ function ThreeProductGridItem({
                         height: 480,
                         width: 480,
                       },
+                      maxWidth: 560,
                     },
                     {
                       size: {

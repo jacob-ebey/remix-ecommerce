@@ -1,10 +1,9 @@
 import type { ReactNode } from "react";
 import { useFetcher, useLocation } from "@remix-run/react";
+import Image from "remix-image";
 import cn from "classnames";
 
 import { PickTranslations } from "~/translations.server";
-
-import { OptimizedImage } from "./optimized-image";
 
 import { CloseIcon, MinusIcon, PlusIcon } from "./icons";
 
@@ -52,7 +51,8 @@ export function CartListItem({
     <li key={variantId} className="mb-6" hidden={optimisticDeleting}>
       <div className="flex">
         <div className="relative block w-16 mr-4 aspect-square">
-          <OptimizedImage
+          <Image
+            unoptimized
             className="absolute inset-0 bg-pink-brand"
             src={image}
             alt=""
@@ -62,6 +62,7 @@ export function CartListItem({
                   width: 64,
                   height: 64,
                 },
+                maxWidth: 80,
               },
               {
                 size: {

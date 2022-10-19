@@ -7,9 +7,9 @@ import {
   useTransition,
 } from "@remix-run/react";
 import cn from "classnames";
+import Image from "remix-image";
 
 import type { FullProduct } from "~/models/ecommerce-provider.server";
-import { OptimizedImage } from "./optimized-image";
 import { PickTranslations } from "~/translations.server";
 import { useNoFlash } from "~/utils/use-no-flash";
 
@@ -194,9 +194,11 @@ function ImageSlider({ images }: { images: string[] }) {
                 key={`${index}|${image}`}
                 className="inline-block w-full h-full snap-start"
               >
-                <OptimizedImage
+                <Image
+                  unoptimized
                   data-source={image}
                   loading={index === 0 ? "eager" : "lazy"}
+                  decoding={index === 0 ? "auto" : "async"}
                   className="w-full h-full object-contain"
                   src={image}
                   alt=""
@@ -238,13 +240,21 @@ function ImageSlider({ images }: { images: string[] }) {
                 onClick={scrollToImage}
               >
                 <span className="sr-only">Focus image {index + 1}</span>
-                <OptimizedImage
+                <Image
                   data-source={image}
                   className="w-full h-full object-cover"
                   src={image}
                   alt=""
                   height={200}
                   width={200}
+                  responsive={[
+                    {
+                      size: {
+                        width: 200,
+                        height: 200,
+                      },
+                    },
+                  ]}
                 />
               </button>
             </li>

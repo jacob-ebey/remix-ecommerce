@@ -1,6 +1,7 @@
 import { Fragment, Suspense, useState } from "react";
 import { Await, Form, Link, PrefetchPageLinks } from "@remix-run/react";
 import type { To } from "react-router-dom";
+import Image from "remix-image";
 import { Popover, Transition } from "@headlessui/react";
 
 import type { PickTranslations } from "~/translations.server";
@@ -11,7 +12,6 @@ import type {
 import type { Language } from "~/models/language";
 
 import { CartIcon, CloseIcon, MenuIcon, WishlistIcon } from "./icons";
-import { OptimizedImage } from "./optimized-image";
 
 export type NavbarCategory = {
   name: string;
@@ -65,7 +65,8 @@ export function Navbar({
                 height={40}
               />
             ) : (
-              <OptimizedImage
+              <Image
+                unoptimized
                 className="w-10 h-10"
                 src={logoHref}
                 alt=""
@@ -214,12 +215,21 @@ export function Navbar({
                   >
                     <div className="flex">
                       <div className="flex items-center flex-1">
-                        <OptimizedImage
+                        <Image
+                          unoptimized
                           className="w-10 h-10"
                           src={logoHref}
                           alt=""
                           width={40}
                           height={40}
+                          responsive={[
+                            {
+                              size: {
+                                width: 80,
+                                height: 80,
+                              },
+                            },
+                          ]}
                         />
                       </div>
                       <div className="flex flex-row-reverse">

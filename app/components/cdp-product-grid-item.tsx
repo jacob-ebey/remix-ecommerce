@@ -2,9 +2,9 @@ import { useId } from "react";
 import { Form, Link, useLocation } from "@remix-run/react";
 import cn from "classnames";
 import type { To } from "react-router-dom";
+import Image from "remix-image";
 
 import { WishlistIcon } from "~/components/icons";
-import { OptimizedImage } from "~/components/optimized-image";
 import { PickTranslations } from "~/translations.server";
 
 export type CdpGridItemProduct = {
@@ -36,7 +36,8 @@ export function CdpProductGridItem({
           to={product.to}
           aria-labelledby={id}
         >
-          <OptimizedImage
+          <Image
+            unoptimized
             className="object-cover w-full h-full transition duration-500 transform motion-safe:group-focus:scale-110 motion-safe:group-hover:scale-110"
             src={product.image}
             width={480}
@@ -47,6 +48,7 @@ export function CdpProductGridItem({
                   height: 480,
                   width: 480,
                 },
+                maxWidth: 550,
               },
               {
                 size: {
