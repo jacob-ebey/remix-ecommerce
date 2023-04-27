@@ -8,9 +8,6 @@ export function loader({ request }: LoaderArgs) {
   return imageLoader(
     {
       selfUrl: url.href,
-      cache: new DiskCache({
-        path: ".cache/images",
-      }),
       resolver: async (asset, url, options, basePath) => {
         return await fetchResolver(asset, url, options, basePath);
       },

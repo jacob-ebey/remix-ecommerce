@@ -3,8 +3,8 @@ import type { MouseEventHandler } from "react";
 import {
   Form,
   useLocation,
+  useNavigation,
   useSearchParams,
-  useTransition,
 } from "@remix-run/react";
 import cn from "classnames";
 import Image from "remix-image";
@@ -22,18 +22,18 @@ export function ProductDetails({
     "Add to cart" | "Sold out" | "Added!" | "Adding"
   >;
 }) {
-  let transition = useTransition();
+  let navigation = useNavigation();
   let location = useLocation();
   let [currentSearchParams] = useSearchParams();
   let searchParams =
-    transition.type === "loaderSubmission" && transition.submission?.formData
-      ? (transition.submission.formData as URLSearchParams)
+    navigation.formMethod?.toUpperCase() === "GET" && navigation.formData
+      ? (navigation.formData as URLSearchParams)
       : currentSearchParams;
 
   let disabled =
     !product.selectedVariantId ||
     !product.availableForSale ||
-    transition.state !== "idle";
+    navigation.state !== "idle";
 
   return (
     <main>
@@ -57,7 +57,7 @@ export function ProductDetails({
               <>
                 {product.options.map((option) => (
                   <div key={option.name} className="mt-6">
-                    <Form replace action={location.pathname}>
+                    <Form preventScrollReset replace action={location.pathname}>
                       {Array.from(searchParams.entries()).map(([key, value]) =>
                         key === option.name ? null : (
                           <input
@@ -101,7 +101,7 @@ export function ProductDetails({
                 ) : null}
               </>
             ) : null}
-            <Form replace method="post" className="mt-8">
+            <Form preventScrollReset replace method="post" className="mt-8">
               <input
                 type="hidden"
                 name="_action"
@@ -149,21 +149,21 @@ function SubmissionSequenceText({
   strings: String[];
   action: string;
 }) {
-  let transition = useTransition();
+  let navigation = useNavigation();
   let [text, setText] = useState(strings[0]);
 
   useEffect(() => {
-    if (transition.submission?.formData.get("_action") === action) {
-      if (transition.state === "submitting") {
+    if (navigation.formData?.get("_action") === action) {
+      if (navigation.state === "submitting") {
         setText(strings[1]);
-      } else if (transition.state === "loading") {
+      } else if (navigation.state === "loading") {
         setText(strings[2]);
       }
     } else {
       let id = setTimeout(() => setText(strings[0]), 1000);
       return () => clearTimeout(id);
     }
-  }, [transition]);
+  }, [navigation]);
 
   return <span>{text}</span>;
 }

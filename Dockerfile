@@ -3,8 +3,13 @@ FROM node:17-bullseye-slim as base
 ENV NODE_ENV=production
 ENV PORT=8080
 
+FROM base as builder
+
+RUN apt-get update
+RUN apt-get install build-essential python3 -y
+
 # install all node_modules, including dev
-FROM base as deps
+FROM builder as deps
 
 RUN mkdir /app/
 WORKDIR /app/

@@ -1,23 +1,33 @@
 import type { LoaderArgs } from "@remix-run/node";
-import { defer } from "@remix-run/node";
+import { json } from "@remix-run/node";
 
 import commerce from "~/commerce.server";
 import { getSession } from "~/session.server";
 import { getTranslations } from "~/translations.server";
 
+function time<T>(label: string) {
+  console.time(label);
+  return (r: T) => {
+    console.timeEnd(label);
+    return r;
+  };
+}
+
 export async function loader({ request, params }: LoaderArgs) {
   let session = await getSession(request, params);
   let lang = session.getLanguage();
-  let [categories, pages, cart, wishlist] = [
-    commerce.getCategories(lang, 2),
-    commerce.getPages(lang),
+  let [categories, pages, cart, wishlist] = await Promise.all([
+    commerce.getCategories(lang, 2).then(time("get categories root")),
+    commerce.getPages(lang).then(time("get pages root")),
     session
       .getCart()
-      .then((cartItems) => commerce.getCartInfo(lang, cartItems)),
+      .then((cartItems) => commerce.getCartInfo(lang, cartItems))
+      .then(time("get cart info root")),
     session
       .getWishlist()
-      .then((wishlistItems) => commerce.getWishlistInfo(lang, wishlistItems)),
-  ];
+      .then((wishlistItems) => commerce.getWishlistInfo(lang, wishlistItems))
+      .then(time("get wishlist info root")),
+  ]).then(time("get all root"));
 
   let translations = getTranslations(lang, [
     "All",
@@ -48,7 +58,7 @@ export async function loader({ request, params }: LoaderArgs) {
     "Move to cart",
   ]);
 
-  return defer({
+  return json({
     cart,
     lang,
     pages: [

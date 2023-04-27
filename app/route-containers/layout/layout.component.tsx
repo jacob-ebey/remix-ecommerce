@@ -1,12 +1,13 @@
 import { Suspense, lazy, useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import type {
-  ShouldReloadFunction,
-  UseDataFunctionReturn,
-} from "@remix-run/react";
+  LinksFunction,
+  MetaFunction,
+  SerializeFrom,
+} from "@remix-run/node";
+import type { ShouldRevalidateFunction } from "@remix-run/react";
 import {
-  Await,
+  // Await,
   Links,
   LiveReload,
   Meta,
@@ -15,6 +16,7 @@ import {
   ScrollRestoration,
   useMatches,
 } from "@remix-run/react";
+import { cssBundleHref } from "@remix-run/css-bundle";
 
 import { ClientOnly } from "~/components/client-only";
 import { Footer } from "~/components/footer";
@@ -52,6 +54,7 @@ export const meta: MetaFunction = () => {
 
 export let links: LinksFunction = () => {
   return [
+    ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
     {
       rel: "stylesheet",
       href: globalStylesheetHref,
@@ -65,14 +68,12 @@ function Layout({
   children,
 }: {
   children?: ReactNode;
-  cart?: UseDataFunctionReturn<typeof loader>["cart"];
-  wishlist?: UseDataFunctionReturn<typeof loader>["wishlist"];
+  cart?: SerializeFrom<typeof loader>["cart"];
+  wishlist?: SerializeFrom<typeof loader>["wishlist"];
 }) {
   let matches = useMatches();
   let rootMatch = matches.find((match) => match.id === "root");
-  let loaderData = rootMatch?.data as
-    | UseDataFunctionReturn<typeof loader>
-    | undefined;
+  let loaderData = rootMatch?.data as SerializeFrom<typeof loader> | undefined;
 
   let { categories, lang, pages, translations } = loaderData || {
     lang: "en",
@@ -130,16 +131,16 @@ function Layout({
       <ClientOnly>
         {translations ? (
           <Suspense>
-            <Await resolve={wishlist}>
-              {(wishlist) => (
-                <WishlistPopover
-                  wishlist={wishlist}
-                  open={wishlistOpen}
-                  translations={translations!}
-                  onClose={() => setWishlistOpen(false)}
-                />
-              )}
-            </Await>
+            {/* <Await resolve={wishlist}>
+              {(wishlist) => ( */}
+            <WishlistPopover
+              wishlist={wishlist}
+              open={wishlistOpen}
+              translations={translations!}
+              onClose={() => setWishlistOpen(false)}
+            />
+            {/* )}
+            </Await> */}
           </Suspense>
         ) : null}
       </ClientOnly>
@@ -147,16 +148,16 @@ function Layout({
       <ClientOnly>
         {translations ? (
           <Suspense>
-            <Await resolve={cart}>
-              {(cart) => (
-                <CartPopover
-                  cart={cart}
-                  open={cartOpen}
-                  translations={translations!}
-                  onClose={() => setCartOpen(false)}
-                />
-              )}
-            </Await>
+            {/* <Await resolve={cart}>
+              {(cart) => ( */}
+            <CartPopover
+              cart={cart}
+              open={cartOpen}
+              translations={translations!}
+              onClose={() => setCartOpen(false)}
+            />
+            {/* )}
+            </Await> */}
           </Suspense>
         ) : null}
       </ClientOnly>
@@ -167,9 +168,7 @@ function Layout({
 function Document({ children }: { children: ReactNode }) {
   let matches = useMatches();
   let rootMatch = matches.find((match) => match.id === "root");
-  let loaderData = rootMatch?.data as
-    | UseDataFunctionReturn<typeof loader>
-    | undefined;
+  let loaderData = rootMatch?.data as SerializeFrom<typeof loader> | undefined;
 
   let { cart, lang, wishlist } = loaderData || {
     lang: "en",
@@ -213,8 +212,18 @@ export function ErrorBoundary({ error }: { error: Error }) {
   );
 }
 
-export let unstable_shouldReload: ShouldReloadFunction = ({ url }) => {
-  return !url.pathname.startsWith("/search");
+export let shouldRevalidate: ShouldRevalidateFunction = ({
+  nextUrl,
+  defaultShouldRevalidate,
+  formMethod,
+}) => {
+  if (
+    !nextUrl.pathname.startsWith("/search") &&
+    formMethod?.toUpperCase() !== "POST"
+  ) {
+    return false;
+  }
+  return defaultShouldRevalidate;
 };
 
 export default function Root() {

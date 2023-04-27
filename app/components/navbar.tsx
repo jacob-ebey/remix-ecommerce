@@ -1,5 +1,5 @@
 import { Fragment, Suspense, useState } from "react";
-import { Await, Form, Link, PrefetchPageLinks } from "@remix-run/react";
+import { Form, Link, PrefetchPageLinks } from "@remix-run/react";
 import type { To } from "react-router-dom";
 import Image from "remix-image";
 import { Popover, Transition } from "@headlessui/react";
@@ -29,8 +29,8 @@ export function Navbar({
   cart,
   wishlist,
 }: {
-  cart?: Promise<CartInfo | null>;
-  wishlist?: Promise<FullWishlistItem[] | null>;
+  cart?: CartInfo | null;
+  wishlist?: FullWishlistItem[] | null;
   onOpenCart?: () => void;
   onOpenWishlist?: () => void;
   lang: Language;
@@ -131,26 +131,24 @@ export function Navbar({
             ) : null}
             <CartIcon className="w-8 h-8" />
             <Suspense>
-              <Await resolve={cart}>
-                {(cart) => {
-                  let cartCount = cart?.items?.reduce(
-                    (acc, item) => acc + (item.quantity || 0),
-                    0
-                  );
+              {(() => {
+                let cartCount = cart?.items?.reduce(
+                  (acc, item) => acc + (item.quantity || 0),
+                  0
+                );
 
-                  return (
-                    !!cartCount && (
-                      <span
-                        data-testid="cart-count"
-                        style={{ lineHeight: "0.75rem" }}
-                        className="absolute bottom-0 left-0 translate translate-y-[25%] translate-x-[-25%] inline-flex items-center justify-center px-[0.25rem] py-[0.125rem] text-xs text-zinc-900 bg-gray-50 group-hover:bg-gray-300 rounded-full"
-                      >
-                        {cartCount}
-                      </span>
-                    )
-                  );
-                }}
-              </Await>
+                return (
+                  !!cartCount && (
+                    <span
+                      data-testid="cart-count"
+                      style={{ lineHeight: "0.75rem" }}
+                      className="absolute bottom-0 left-0 translate translate-y-[25%] translate-x-[-25%] inline-flex items-center justify-center px-[0.25rem] py-[0.125rem] text-xs text-zinc-900 bg-gray-50 group-hover:bg-gray-300 rounded-full"
+                    >
+                      {cartCount}
+                    </span>
+                  )
+                );
+              })()}
             </Suspense>
           </Link>
           <Link
@@ -169,26 +167,24 @@ export function Navbar({
             </span>
             <WishlistIcon className="w-8 h-8" />
             <Suspense>
-              <Await resolve={wishlist}>
-                {(wishlist) => {
-                  let wishlistCount = wishlist?.reduce(
-                    (acc, item) => acc + item.quantity,
-                    0
-                  );
+              {(() => {
+                let wishlistCount = wishlist?.reduce(
+                  (acc, item) => acc + item.quantity,
+                  0
+                );
 
-                  return (
-                    !!wishlistCount && (
-                      <span
-                        data-testid="wishlist-count"
-                        style={{ lineHeight: "0.75rem" }}
-                        className="absolute bottom-0 left-0 translate translate-y-[25%] translate-x-[-25%] inline-flex items-center justify-center px-[0.25rem] py-[0.125rem] text-xs text-zinc-900 bg-gray-50 group-hover:bg-gray-300 rounded-full"
-                      >
-                        {wishlistCount}
-                      </span>
-                    )
-                  );
-                }}
-              </Await>
+                return (
+                  !!wishlistCount && (
+                    <span
+                      data-testid="wishlist-count"
+                      style={{ lineHeight: "0.75rem" }}
+                      className="absolute bottom-0 left-0 translate translate-y-[25%] translate-x-[-25%] inline-flex items-center justify-center px-[0.25rem] py-[0.125rem] text-xs text-zinc-900 bg-gray-50 group-hover:bg-gray-300 rounded-full"
+                    >
+                      {wishlistCount}
+                    </span>
+                  )
+                );
+              })()}
             </Suspense>
           </Link>
           <Popover className="relative flex items-center ml-4 lg:hidden">

@@ -16,8 +16,18 @@ type CDPProduct = {
   defaultVariantId: string;
 };
 
+function time<T>(label: string) {
+  // console.time(label);
+  return (r: T) => {
+    // console.timeEnd(label);
+    return r;
+  };
+}
+
 export async function loader({ request, params }: LoaderArgs) {
+  console.time("get session");
   let session = await getSession(request, params);
+  console.timeEnd("get session");
   let lang = session.getLanguage();
   let url = new URL(request.url);
 
@@ -28,10 +38,12 @@ export async function loader({ request, params }: LoaderArgs) {
   let nocache = url.searchParams.has("nocache");
 
   let [categories, sortByOptions, productsPage, wishlist] = await Promise.all([
-    commerce.getCategories(lang, 250, nocache),
-    commerce.getSortByOptions(lang),
-    commerce.getProducts(lang, category, sort, search, cursor, 30, nocache),
-    session.getWishlist(),
+    commerce.getCategories(lang, 250, nocache).then(time("get categories")),
+    commerce.getSortByOptions(lang).then(time("get sort by options")),
+    commerce
+      .getProducts(lang, category, sort, search, cursor, 30, nocache)
+      .then(time("get products page")),
+    session.getWishlist().then(time("get wishlist")),
   ]);
 
   let wishlistHasProduct = new Set(
