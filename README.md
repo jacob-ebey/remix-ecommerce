@@ -1,3 +1,5 @@
+# Please check out the Hydrogen project for Remix ecomm best practices. I am not maintaining this and will probably never look at this repo again. 
+
 # Welcome to Remix!
 
 - [Remix Docs](https://remix.run/docs)
